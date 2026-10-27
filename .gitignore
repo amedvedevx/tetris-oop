@@ -1,0 +1,10 @@
+node_modules/
+dist/
+storybook-static/
+.runtime/
+.cache/
+*.tsbuildinfo
+playwright-report/
+test-results/
+.DS_Store
+*.log
