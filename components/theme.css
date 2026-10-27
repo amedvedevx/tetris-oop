@@ -1,0 +1,35 @@
+@import 'tailwindcss' source('./');
+
+@theme {
+  --font-sans: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --color-ink: #172534;
+  --color-muted: #526173;
+  --color-inverse: #f8fafc;
+  --color-accent: #006970;
+  --color-accent-hover: #00565c;
+  --color-danger: #b42336;
+  --color-danger-hover: #921c2c;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4f6f8;
+  --color-surface-dark: #172534;
+  --color-line: #cbd3dc;
+  --color-piece-i: #32d1d9;
+  --color-piece-o: #f6cb52;
+  --color-piece-t: #b59aff;
+  --color-piece-s: #67cf8c;
+  --color-piece-z: #ff8191;
+  --color-piece-j: #77a9ff;
+  --color-piece-l: #ffb071;
+  --text-title: clamp(1.75rem, 1.25rem + 2vw, 2.75rem);
+  --text-title--line-height: 1.2;
+  --text-heading: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-heading--line-height: 1.3;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.5;
+  --text-label: 0.9375rem;
+  --text-label--line-height: 1.4;
+  --text-metric: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  --text-metric--line-height: 1.25;
+}

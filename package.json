@@ -1,0 +1,32 @@
+{
+  "name": "tetris-oop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25", "npm": ">=11 <12" },
+  "packageManager": "npm@11.21.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "storybook": "storybook dev --host 127.0.0.1 --port 6006 --no-open --ci",
+    "build-storybook": "storybook build --quiet",
+    "check": "npm run typecheck && npm run lint && npm run build && npm run build-storybook"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@storybook/addon-docs": "10.6.5",
+    "@storybook/html-vite": "10.6.5",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.19.2",
+    "eslint": "10.13.0",
+    "globals": "17.13.0",
+    "storybook": "10.6.5",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vite": "7.3.7"
+  }
+}
