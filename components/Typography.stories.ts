@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/html-vite';
-import { Typography, type TypographyProps } from './Typography';
+import { Typography, typographyOptions, type TypographyProps } from './Typography';
 import { Surface } from './Surface';
 
 const meta = {
@@ -8,11 +8,11 @@ const meta = {
   render: Typography,
   args: { text: 'Каждая фигура — новый ход.', as: 'p', variant: 'body', tone: 'default' },
   argTypes: {
-    as: { control: 'select', options: ['h1', 'h2', 'h3', 'p', 'span'] },
-    variant: { control: 'select', options: ['title', 'heading', 'body', 'caption', 'label', 'metric'] },
-    tone: { control: 'select', options: ['default', 'muted', 'inverse', 'accent', 'danger'] },
+    as: { control: 'select', options: typographyOptions.tags },
+    variant: { control: 'select', options: typographyOptions.variants },
+    tone: { control: 'select', options: typographyOptions.tones },
     text: { control: 'text' },
-    live: { control: 'select', options: ['off', 'polite', 'assertive'] },
+    live: { control: 'select', options: typographyOptions.live },
   },
 } satisfies Meta<TypographyProps>;
 

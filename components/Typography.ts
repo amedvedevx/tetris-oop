@@ -1,6 +1,12 @@
-export type TypographyTag = 'h1' | 'h2' | 'h3' | 'p' | 'span';
-export type TypographyVariant = 'title' | 'heading' | 'body' | 'caption' | 'label' | 'metric';
-export type TypographyTone = 'default' | 'muted' | 'inverse' | 'accent' | 'danger';
+export const typographyOptions = {
+  tags: ['h1', 'h2', 'h3', 'p', 'span'],
+  variants: ['title', 'heading', 'body', 'caption', 'label', 'metric'],
+  tones: ['default', 'muted', 'inverse', 'accent', 'danger'],
+  live: ['off', 'polite', 'assertive'],
+} as const;
+export type TypographyTag = typeof typographyOptions.tags[number];
+export type TypographyVariant = typeof typographyOptions.variants[number];
+export type TypographyTone = typeof typographyOptions.tones[number];
 
 export interface TypographyProps {
   text: string | number;
@@ -9,7 +15,7 @@ export interface TypographyProps {
   tone?: TypographyTone;
   id?: string;
   ariaLabel?: string;
-  live?: 'off' | 'polite' | 'assertive';
+  live?: typeof typographyOptions.live[number];
 }
 
 const variants: Record<TypographyVariant, string> = {

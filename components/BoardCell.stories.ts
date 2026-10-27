@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/html-vite';
-import { BoardCell, type BoardCellProps, type PieceKind } from './BoardCell';
+import { BoardCell, boardCellOptions, type BoardCellProps } from './BoardCell';
 import { Wrapper } from './Wrapper';
 
 const meta = {
@@ -10,9 +10,9 @@ const meta = {
     : BoardCell({ state, piece: piece ?? 'T', size, decorative }),
   args: { state: 'empty', size: 'medium', decorative: false },
   argTypes: {
-    state: { control: 'select', options: ['empty', 'active', 'locked'] },
-    piece: { control: 'select', options: ['I', 'O', 'T', 'S', 'Z', 'J', 'L'] },
-    size: { control: 'select', options: ['small', 'medium', 'large', 'fluid'] },
+    state: { control: 'select', options: boardCellOptions.states },
+    piece: { control: 'select', options: boardCellOptions.pieces, if: { arg: 'state', neq: 'empty' } },
+    size: { control: 'select', options: boardCellOptions.sizes },
   },
 } satisfies Meta<BoardCellProps>;
 
@@ -28,8 +28,7 @@ export const Fluid: Story = { args: { state: 'locked', piece: 'J', size: 'fluid'
 export const AllPieces: Story = {
   render: () => Wrapper({
     dir: 'row', gap: 'sm',
-    children: (['I', 'O', 'T', 'S', 'Z', 'J', 'L'] satisfies PieceKind[])
-      .map(piece => BoardCell({ state: 'locked', piece })),
+    children: boardCellOptions.pieces.map(piece => BoardCell({ state: 'locked', piece })),
   }),
 };
 export const Decorative: Story = { args: { state: 'locked', piece: 'S', decorative: true } };

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/html-vite';
-import { Button, type ButtonProps } from './Button';
-import { Typography } from './Typography';
-import { Wrapper } from './Wrapper';
+import { Button, buttonOptions, type ButtonProps } from './Button';
+import { ButtonInteractionDemo } from './ButtonInteractionDemo';
 
 const meta = {
   title: 'Components/Button',
@@ -9,8 +8,8 @@ const meta = {
   render: Button,
   args: { label: 'Начать игру', variant: 'primary', size: 'medium', disabled: false, fullWidth: false },
   argTypes: {
-    variant: { control: 'select', options: ['primary', 'secondary', 'danger'] },
-    size: { control: 'select', options: ['small', 'medium'] },
+    variant: { control: 'select', options: buttonOptions.variants },
+    size: { control: 'select', options: buttonOptions.sizes },
     onClick: { control: false },
   },
 } satisfies Meta<ButtonProps>;
@@ -27,16 +26,4 @@ export const FullWidth: Story = { args: { fullWidth: true } };
 export const LongLabel: Story = {
   args: { label: 'Продолжить текущую игру после возвращения к активной вкладке' },
 };
-export const Interactive: Story = {
-  render: args => {
-    let count = 0;
-    const feedback = Typography({ text: 'Нажатий: 0', live: 'polite' });
-    return Wrapper({
-      gap: 'md',
-      children: [
-        Button({ ...args, onClick: () => { feedback.textContent = `Нажатий: ${++count}`; } }),
-        feedback,
-      ],
-    });
-  },
-};
+export const Interactive: Story = { render: ButtonInteractionDemo };

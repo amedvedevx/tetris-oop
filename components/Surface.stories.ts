@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/html-vite';
-import { Surface, type SurfaceProps } from './Surface';
+import { Surface, surfaceOptions, type SurfaceProps } from './Surface';
 import { Typography } from './Typography';
 import { Wrapper } from './Wrapper';
 
@@ -19,9 +19,9 @@ const meta = {
   }),
   argTypes: {
     children: { control: false, table: { disable: true } },
-    as: { control: 'select', options: ['div', 'section'] },
-    variant: { control: 'select', options: ['plain', 'muted', 'inverted'] },
-    size: { control: 'select', options: ['compact', 'comfortable'] },
+    as: { control: 'select', options: surfaceOptions.tags },
+    variant: { control: 'select', options: surfaceOptions.variants },
+    size: { control: 'select', options: surfaceOptions.sizes },
   },
 } satisfies Meta<SurfaceProps>;
 

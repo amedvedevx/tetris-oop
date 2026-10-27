@@ -1,9 +1,14 @@
-export type PieceKind = 'I' | 'O' | 'T' | 'S' | 'Z' | 'J' | 'L';
+export const boardCellOptions = {
+  pieces: ['I', 'O', 'T', 'S', 'Z', 'J', 'L'],
+  states: ['empty', 'active', 'locked'],
+  sizes: ['small', 'medium', 'large', 'fluid'],
+} as const;
+export type PieceKind = typeof boardCellOptions.pieces[number];
 type CellContent = { state: 'empty'; piece?: never }
-  | { state: 'active' | 'locked'; piece: PieceKind };
+  | { state: Exclude<typeof boardCellOptions.states[number], 'empty'>; piece: PieceKind };
 
 export type BoardCellProps = CellContent & {
-  size?: 'small' | 'medium' | 'large' | 'fluid';
+  size?: typeof boardCellOptions.sizes[number];
   decorative?: boolean;
 };
 
@@ -16,7 +21,7 @@ const colors: Record<PieceKind, string> = {
   J: 'border-piece-j bg-piece-j',
   L: 'border-piece-l bg-piece-l',
 };
-const sizes = {
+const sizes: Record<NonNullable<BoardCellProps['size']>, string> = {
   small: 'size-4', medium: 'size-6', large: 'size-8', fluid: 'w-full',
 };
 
