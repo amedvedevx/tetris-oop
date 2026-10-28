@@ -9,7 +9,7 @@ export const wrapperOptions = {
   alignments: ['start', 'center', 'end', 'stretch'],
   justifications: ['start', 'center', 'end', 'between'],
   widths: ['auto', 'full'],
-  maxWidths: ['none', 'reading', 'game', 'content'],
+  maxWidths: ['none', 'board', 'reading', 'game', 'content'],
 } as const;
 export type Space = typeof wrapperOptions.spaces[number];
 export type Responsive<T> = T | { base: T; sm?: T; md?: T; lg?: T };

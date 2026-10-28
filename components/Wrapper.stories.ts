@@ -28,6 +28,7 @@ export default meta;
 type Story = StoryObj<WrapperProps>;
 
 export const Column: Story = {};
+export const BoardWidth: Story = { args: { width: 'full', maxWidth: 'board' } };
 export const GameWidth: Story = { args: { width: 'full', maxWidth: 'game' } };
 export const Row: Story = { args: { dir: 'row' } };
 export const ResponsiveRow: Story = {

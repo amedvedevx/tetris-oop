@@ -7,7 +7,10 @@ const meta = {
   title: 'Pages/GamePage', tags: ['autodocs'], render: GamePage,
   args: { data: readyScreen() },
   argTypes: { data: { control: 'object' }, onAction: { control: false } },
-  parameters: { layout: 'fullscreen', fullPage: true },
+  parameters: {
+    layout: 'fullscreen', fullPage: true,
+    docs: { description: { component: 'Content-sized panels align in the two-column layout. Status follows the board width; the status and controls share a bottom edge. On narrow screens the blocks stack without fixed heights.' } },
+  },
 } satisfies Meta<GamePageProps>;
 export default meta;
 type Story = StoryObj<GamePageProps>;

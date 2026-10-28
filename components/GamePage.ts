@@ -15,9 +15,9 @@ export interface GamePageElement extends HTMLDivElement { update(data: GameScree
 
 export function GamePage({ data, onAction }: GamePageProps): GamePageElement {
   const notice = onAction ? undefined : 'Это демонстрация интерфейса: можно изучить поле и управление.';
-  const board = Wrapper({ align: 'center', children: [GameBoard({ cells: data.cells })] });
-  const stats = Wrapper({ children: [GameStats(data.metrics)] });
-  const preview = Wrapper({ children: [NextPiecePreview({ piece: data.next })] });
+  const board = Wrapper({ maxWidth: 'board', width: 'full', children: [GameBoard({ cells: data.cells })] });
+  const stats = Wrapper({ display: 'grid', children: [GameStats(data.metrics)] });
+  const preview = Wrapper({ display: 'grid', children: [NextPiecePreview({ piece: data.next })] });
   const status = GameStatus({ phase: data.phase, ...(notice ? { message: notice } : {}) });
   const controls = GameControls({ phase: data.phase, ...(onAction ? { onAction } : {}) });
   const element = document.createElement('div');
@@ -25,10 +25,13 @@ export function GamePage({ data, onAction }: GamePageProps): GamePageElement {
   element.append(Wrapper({ align: 'center', children: [
     Wrapper({ as: 'main', maxWidth: 'game', width: 'full', padding: { base: 'md', md: 'xl' }, gap: 'lg', children: [
       GameHeader(),
-      Wrapper({ display: 'grid', columns: { base: 1, md: 2 }, gap: 'lg', align: 'start', children: [
-        Wrapper({ gap: 'lg', children: [board, status] }),
-        Wrapper({ gap: 'lg', children: [
-          Wrapper({ display: 'grid', columns: { base: 1, lg: 2 }, gap: 'md', align: 'start', children: [stats, preview] }),
+      Wrapper({ display: 'grid', columns: { base: 1, md: 2 }, gap: 'lg', children: [
+        Wrapper({ gap: 'lg', align: 'center', justify: 'between', children: [
+          board,
+          Wrapper({ maxWidth: 'board', width: 'full', children: [status] }),
+        ] }),
+        Wrapper({ gap: 'lg', justify: 'between', children: [
+          Wrapper({ display: 'grid', columns: { base: 1, lg: 2 }, gap: 'md', children: [stats, preview] }),
           controls,
         ] }),
       ] }),
