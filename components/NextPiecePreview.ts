@@ -31,7 +31,7 @@ export function NextPiecePreview({ piece }: NextPiecePreviewProps): HTMLElement 
     size: 'compact', as: 'section', ariaLabel: 'Следующая фигура',
     children: [Wrapper({ gap: 'md', children: [
       Typography({ as: 'h2', variant: 'label', text: 'Следующая фигура' }),
-      stencil,
+      Wrapper({ align: 'center', children: [stencil] }),
       Typography({ variant: 'caption', tone: 'muted', text: piece ? 'Одна фигура вперёд.' : 'Появится после начала партии.' }),
     ] })],
   });

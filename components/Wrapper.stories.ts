@@ -28,7 +28,10 @@ export default meta;
 type Story = StoryObj<WrapperProps>;
 
 export const Column: Story = {};
-export const BoardWidth: Story = { args: { width: 'full', maxWidth: 'board' } };
+export const BoardWidth: Story = {
+  args: { width: 'full', maxWidth: 'board' },
+  parameters: { docs: { description: { story: 'The board column includes the visible frame and is shared by the board and status panel.' } } },
+};
 export const GameWidth: Story = { args: { width: 'full', maxWidth: 'game' } };
 export const Row: Story = { args: { dir: 'row' } };
 export const ResponsiveRow: Story = {

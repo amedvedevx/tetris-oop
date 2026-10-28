@@ -5,6 +5,7 @@ import { previewPieces } from './gameShell.fixtures';
 const meta = {
   title: 'Blocks/NextPiecePreview', tags: ['autodocs'], render: NextPiecePreview,
   args: { piece: null }, argTypes: { piece: { control: 'object' } },
+  parameters: { docs: { description: { component: 'The mini-board is centered horizontally in the panel. The heading and explanatory text remain left-aligned.' } } },
 } satisfies Meta<NextPiecePreviewProps>;
 export default meta;
 type Story = StoryObj<NextPiecePreviewProps>;

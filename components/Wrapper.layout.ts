@@ -71,7 +71,7 @@ export function wrapperClasses(props: WrapperProps): string {
     width = 'auto', maxWidth = 'none',
   } = props;
   const widths = { auto: 'w-auto', full: 'w-full' };
-  const maximums = { none: 'max-w-none', board: 'max-w-80', reading: 'max-w-prose', game: 'max-w-4xl', content: 'max-w-6xl' };
+  const maximums = { none: 'max-w-none', board: 'max-w-board', reading: 'max-w-prose', game: 'max-w-4xl', content: 'max-w-6xl' };
   return [
     'min-w-0', props.display === 'grid' ? 'grid' : 'flex', widths[width], maximums[maxWidth],
     props.display === 'grid'

@@ -11,14 +11,17 @@ export function GameBoard({ cells, ariaLabel = 'Игровое поле: 10 ст
     throw new RangeError('GameBoard requires exactly 20 rows of 10 cells');
   }
   const element = document.createElement('div');
-  element.className = 'grid aspect-[1/2] w-full max-w-80 grid-cols-10 grid-rows-20 rounded-sm bg-surface-dark shadow-lg ring-4 ring-surface-dark';
+  element.className = 'w-full max-w-board rounded-lg bg-surface-dark p-1 shadow-lg';
   element.setAttribute('role', 'img');
   element.setAttribute('aria-label', ariaLabel);
+  const grid = document.createElement('div');
+  grid.className = 'grid aspect-[1/2] w-full grid-cols-10 grid-rows-20';
   cells.forEach((row, y) => row.forEach((content, x) => {
     const cell = BoardCell({ ...content, size: 'fluid', decorative: true });
     cell.dataset.x = String(x);
     cell.dataset.y = String(y);
-    element.append(cell);
+    grid.append(cell);
   }));
+  element.append(grid);
   return element;
 }

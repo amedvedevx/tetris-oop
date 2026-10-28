@@ -1,6 +1,7 @@
 @import 'tailwindcss' source('./');
 
 @theme {
+  --container-board: 20.5rem;
   --font-sans: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   --color-ink: #172534;
   --color-muted: #526173;
