@@ -4,7 +4,9 @@ import '../components/theme.css';
 
 const preview: Preview = {
   parameters: { layout: 'fullscreen' },
-  decorators: [story => Wrapper({ padding: 'md', children: [story() as HTMLElement] })],
+  decorators: [(story, context) => context.parameters.fullPage
+    ? story()
+    : Wrapper({ padding: 'md', children: [story() as HTMLElement] })],
 };
 
 export default preview;

@@ -17,6 +17,10 @@ export interface ButtonProps {
   ariaDescribedBy?: string;
 }
 
+export interface ButtonElement extends HTMLButtonElement {
+  setLabel(label: string): void;
+}
+
 interface ButtonAppearance {
   classes: string;
   labelTone: TypographyTone;
@@ -35,7 +39,7 @@ const sizes: Record<NonNullable<ButtonProps['size']>, string> = {
 export function Button({
   label, variant = 'primary', size = 'medium', disabled = false,
   fullWidth = false, onClick, id, ariaLabel, ariaDescribedBy,
-}: ButtonProps): HTMLButtonElement {
+}: ButtonProps): ButtonElement {
   const element = document.createElement('button');
   element.type = 'button';
   element.disabled = disabled;
@@ -45,13 +49,14 @@ export function Button({
     'disabled:cursor-not-allowed disabled:opacity-55',
     variants[variant].classes, sizes[size], fullWidth ? 'w-full' : 'w-fit',
   ].join(' ');
-  element.append(Typography({
+  const caption = Typography({
     as: 'span', variant: 'label', text: label,
     tone: variants[variant].labelTone,
-  }));
+  });
+  element.append(caption);
   if (id) element.id = id;
   if (ariaLabel) element.setAttribute('aria-label', ariaLabel);
   if (ariaDescribedBy) element.setAttribute('aria-describedby', ariaDescribedBy);
   if (onClick) element.addEventListener('click', onClick);
-  return element;
+  return Object.assign(element, { setLabel: (text: string) => { caption.textContent = text; } });
 }

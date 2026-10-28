@@ -4,7 +4,7 @@ export const boardCellOptions = {
   sizes: ['small', 'medium', 'large', 'fluid'],
 } as const;
 export type PieceKind = typeof boardCellOptions.pieces[number];
-type CellContent = { state: 'empty'; piece?: never }
+export type CellContent = { state: 'empty'; piece?: never }
   | { state: Exclude<typeof boardCellOptions.states[number], 'empty'>; piece: PieceKind };
 
 export type BoardCellProps = CellContent & {
