@@ -1,5 +1,5 @@
 import { GameBoard } from './GameBoard';
-import { GameControls } from './GameControls';
+import { GameControls, type GameControlsAvailability } from './GameControls';
 import { GameHeader } from './GameHeader';
 import type { GameAction, GameScreenData } from './GameScreenData';
 import { GameStats } from './GameStats';
@@ -10,16 +10,18 @@ import { Wrapper } from './Wrapper';
 export interface GamePageProps {
   data: GameScreenData;
   onAction?: (action: GameAction) => void;
+  availability?: GameControlsAvailability;
+  statusMessage?: string;
 }
 export interface GamePageElement extends HTMLDivElement { update(data: GameScreenData): void }
 
-export function GamePage({ data, onAction }: GamePageProps): GamePageElement {
-  const notice = onAction ? undefined : 'Это демонстрация интерфейса: можно изучить поле и управление.';
+export function GamePage({ data, onAction, availability, statusMessage }: GamePageProps): GamePageElement {
+  const notice = statusMessage ?? (onAction ? undefined : 'Это демонстрация интерфейса: можно изучить поле и управление.');
   const board = Wrapper({ maxWidth: 'board', width: 'full', children: [GameBoard({ cells: data.cells })] });
   const stats = Wrapper({ display: 'grid', children: [GameStats(data.metrics)] });
   const preview = Wrapper({ display: 'grid', children: [NextPiecePreview({ piece: data.next })] });
-  const status = GameStatus({ phase: data.phase, ...(notice ? { message: notice } : {}) });
-  const controls = GameControls({ phase: data.phase, ...(onAction ? { onAction } : {}) });
+  const status = GameStatus({ phase: data.phase, ...(notice !== undefined ? { message: notice } : {}) });
+  const controls = GameControls({ phase: data.phase, ...(onAction ? { onAction } : {}), ...(availability ? { availability } : {}) });
   const element = document.createElement('div');
   element.className = 'min-h-screen bg-surface-muted';
   element.append(Wrapper({ align: 'center', children: [

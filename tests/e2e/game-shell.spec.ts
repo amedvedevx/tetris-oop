@@ -48,7 +48,7 @@ async function expectAllTextReadable(container: Locator) {
 }
 
 for (const width of [320, 768, 1280]) {
-  test(`static production composition stays honest and unavailable at ${width}px`, async ({ page }) => {
+  test(`production ready screen exposes only available controls at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     expect((await page.goto('http://127.0.0.1:4180/'))?.ok()).toBe(true);
     const main = page.getByRole('main');
@@ -57,44 +57,43 @@ for (const width of [320, 768, 1280]) {
     for (const name of ['Показатели партии', 'Следующая фигура', 'Управление']) {
       await expect(main.getByRole('region', { name, exact: true })).toBeVisible();
     }
-    await expectMetrics(page, { Очки: '0', Рекорд: '0', Линии: '0', Уровень: '1' });
     const board = page.getByRole('img', { name: 'Игровое поле: 10 столбцов, 20 строк', exact: true });
-    await expect(board.locator('[data-x][data-y]')).toHaveCount(200);
-    expect(await cells(board)).toEqual([]);
     const preview = page.getByRole('img', { name: 'Следующая фигура ещё не выбрана', exact: true });
-    await expect(preview.locator('[data-state="empty"]')).toHaveCount(16);
-    await expect(preview.locator('[data-piece]')).toHaveCount(0);
-    await expect(main.getByRole('img')).toHaveCount(2);
     const status = page.getByRole('status');
-    await expect(status).toHaveAttribute('aria-live', 'polite');
-    await expect(status).toHaveAttribute('aria-atomic', 'true');
-    await expect(status.getByRole('heading', { name: 'Готов к новой партии' })).toBeVisible();
-    await expect(status).toContainText('Это демонстрация интерфейса: можно изучить поле и управление.');
     const controls = page.getByRole('region', { name: 'Управление', exact: true });
-    await expect(controls).toContainText('Демонстрация интерфейса. Управление пока недоступно.');
     const actions = controls.getByRole('button');
-    await expect(actions).toHaveCount(2);
-    await expect(actions.nth(0)).toHaveAccessibleName('Начать игру');
-    await expect(actions.nth(1)).toHaveAccessibleName('Пауза');
-    for (const action of await actions.all()) {
-      await expect(action).toBeDisabled();
-      await action.scrollIntoViewIfNeeded();
-      const box = (await action.boundingBox())!;
-      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-      await expect(action).not.toBeFocused();
-    }
+    const expectReady = async () => {
+      await expectMetrics(page, { Очки: '0', Рекорд: '0', Линии: '0', Уровень: '1' });
+      await expect(board.locator('[data-x][data-y]')).toHaveCount(200);
+      await expect(board.locator('[data-state="empty"]')).toHaveCount(200);
+      expect(await cells(board)).toEqual([]);
+      await expect(preview.locator('[data-state="empty"]')).toHaveCount(16);
+      await expect(preview.locator('[data-piece]')).toHaveCount(0);
+      await expect(main.getByRole('img')).toHaveCount(2);
+      await expect(status).toHaveAttribute('data-phase', 'ready');
+      await expect(status).toHaveAttribute('aria-live', 'polite');
+      await expect(status).toHaveAttribute('aria-atomic', 'true');
+      await expect(status.getByRole('heading', { name: 'Готов к новой партии' })).toBeVisible();
+      await expect(status).toContainText('Пока доступны начало и перезапуск партии. Движение, падение и пауза появятся позже.');
+      await expect(controls.locator('kbd')).toHaveCount(0);
+      await expect(actions).toHaveCount(2);
+      await expect(actions.nth(0)).toHaveAccessibleName('Начать игру');
+      await expect(actions.nth(0)).toBeEnabled();
+      await expect(actions.nth(1)).toHaveAccessibleName('Пауза');
+      await expect(actions.nth(1)).toBeDisabled();
+    };
+    await expectReady();
+    // Reach the enabled Start from a fresh page before a disabled pointer click can affect tab order.
     await page.keyboard.press('Tab');
-    await expect(actions.nth(0)).not.toBeFocused();
-    await expect(actions.nth(1)).not.toBeFocused();
-    await page.keyboard.press('Enter');
-    await page.keyboard.press('Space');
-    await expect(status).toHaveAttribute('data-phase', 'ready');
-    expect(await cells(board)).toEqual([]);
+    await expect(actions.nth(0)).toBeFocused();
+    await actions.nth(1).scrollIntoViewIfNeeded();
+    const box = (await actions.nth(1).boundingBox())!;
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await expectReady();
     await expectGameLayout(page, width);
     await page.reload();
-    await expect(page.getByRole('status')).toHaveAttribute('data-phase', 'ready');
-    await expectMetrics(page, { Очки: '0', Рекорд: '0', Линии: '0', Уровень: '1' });
-    expect(await cells(page.getByRole('img', { name: 'Игровое поле: 10 столбцов, 20 строк', exact: true }))).toEqual([]);
+    await expectReady();
+    await expectGameLayout(page, width);
   });
 
   test(`running page respects grid, frame and panel geometry at ${width}px`, async ({ page }) => {
