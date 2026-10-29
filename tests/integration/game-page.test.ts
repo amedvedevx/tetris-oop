@@ -43,13 +43,20 @@ function occupied(board: HTMLElement) {
     .map(cell => [Number(cell.dataset.x), Number(cell.dataset.y), cell.dataset.state, cell.dataset.piece]);
 }
 
-function previewRows(panel: HTMLElement) {
+function sourcePreviewRows(panel: HTMLElement) {
   const image = within(panel).getByRole('img');
   const cells = Array.from(image.querySelectorAll<HTMLElement>('[data-state]'));
-  expect(cells).toHaveLength(16);
+  const positions = Array.from(image.querySelectorAll<HTMLElement>('[data-preview-x][data-preview-y]'));
+  expect(cells).toHaveLength(positions.length ? 20 : 16);
+  expect(positions.length === 0 || positions.length === 4).toBe(true);
+  expect(cells.filter(cell => cell.dataset.state === 'empty')).toHaveLength(16);
   for (const cell of cells) expect(cell).toHaveAttribute('aria-hidden', 'true');
-  return Array.from({ length: 4 }, (_, row) => cells.slice(row * 4, row * 4 + 4)
-    .map(cell => cell.dataset.state === 'empty' ? '.' : cell.dataset.piece).join(''));
+  const rows = Array.from({ length: 4 }, () => Array<string>(4).fill('.'));
+  for (const position of positions) {
+    const cell = position.querySelector<HTMLElement>('[data-state="locked"]')!;
+    rows[Number(position.dataset.previewY)]![Number(position.dataset.previewX)] = cell.dataset.piece!;
+  }
+  return rows.map(row => row.join(''));
 }
 
 const originalCells = [
@@ -74,7 +81,7 @@ describe('real static GamePage composition', () => {
     }
     expect(occupied(view.board)).toEqual(originalCells);
     expect(metrics(view.stats)).toEqual({ Очки: '1240', Рекорд: '9800', Линии: '0', Уровень: '1' });
-    expect(previewRows(view.preview)).toEqual(['J...', 'JJJ.', '....', '....']);
+    expect(sourcePreviewRows(view.preview)).toEqual(['J...', 'JJJ.', '....', '....']);
     expect(within(view.preview).getByRole('img', { name: 'Следующая фигура: J' })).toBeVisible();
     expect(screen.getAllByRole('img')).toHaveLength(2);
     expect(view.status).toHaveAttribute('aria-live', 'polite');
@@ -102,7 +109,7 @@ describe('real static GamePage composition', () => {
     for (const old of [initial.board, initial.stats, initial.preview]) expect(old).not.toBeInTheDocument();
     expect(occupied(updated.board)).toEqual(changedCells);
     expect(metrics(updated.stats)).toEqual({ Очки: '7700', Рекорд: '11000', Линии: '12', Уровень: '2' });
-    expect(previewRows(updated.preview)).toEqual(['..L.', 'LLL.', '....', '....']);
+    expect(sourcePreviewRows(updated.preview)).toEqual(['..L.', 'LLL.', '....', '....']);
     expect(updated.status).toHaveTextContent('Пауза');
     expect(updated.status).toHaveAttribute('data-phase', 'paused');
     expect(within(page).queryByText('Партия идёт', { exact: true })).not.toBeInTheDocument();
@@ -118,7 +125,7 @@ describe('real static GamePage composition', () => {
     page.update(suppliedScreen({ phase: 'ready', cells: emptyCells(), next: null, metrics: { score: 0, highScore: 11000, lines: 0, level: 1 } }));
     const cleared = nodes(page);
     expect(occupied(cleared.board)).toEqual([]);
-    expect(previewRows(cleared.preview)).toEqual(['....', '....', '....', '....']);
+    expect(sourcePreviewRows(cleared.preview)).toEqual(['....', '....', '....', '....']);
     expect(within(cleared.preview).getByRole('img', { name: 'Следующая фигура ещё не выбрана' })).toBeVisible();
     expect(cleared.preview.querySelectorAll('[data-piece]')).toHaveLength(0);
     expect(metrics(cleared.stats)).toEqual({ Очки: '0', Рекорд: '11000', Линии: '0', Уровень: '1' });
@@ -263,14 +270,14 @@ describe.each(rejectedUpdates)('atomic rejection of $group', ({ cases }) => {
     expect(before.buttons[0]).toHaveFocus();
     expect(occupied(after.board)).toEqual(originalCells);
     expect(metrics(after.stats)).toEqual({ Очки: '1240', Рекорд: '9800', Линии: '0', Уровень: '1' });
-    expect(previewRows(after.preview)).toEqual(['J...', 'JJJ.', '....', '....']);
+    expect(sourcePreviewRows(after.preview)).toEqual(['J...', 'JJJ.', '....', '....']);
     expect(after.status).toHaveAttribute('data-phase', 'running');
     await user.click(after.buttons[0]!);
     expect(history).toEqual(['restart']);
     page.update(replacementScreen());
     expect(occupied(nodes(page).board)).toEqual(changedCells);
     expect(metrics(nodes(page).stats)).toEqual({ Очки: '7700', Рекорд: '11000', Линии: '12', Уровень: '2' });
-    expect(previewRows(nodes(page).preview)).toEqual(['..L.', 'LLL.', '....', '....']);
+    expect(sourcePreviewRows(nodes(page).preview)).toEqual(['..L.', 'LLL.', '....', '....']);
     expect(nodes(page).buttons[0]).toHaveFocus();
     await user.click(within(page).getByRole('button', { name: 'Продолжить игру' }));
     expect(history).toEqual(['restart', 'resume']);

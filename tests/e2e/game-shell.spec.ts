@@ -33,9 +33,13 @@ async function expectDemoSnapshot(page: Page, phase: 'running' | 'paused') {
   await expect(board.locator('[data-x][data-y]')).toHaveCount(200);
   expect(await cells(board)).toEqual(demoOccupied);
   const preview = page.getByRole('img', { name: 'Следующая фигура: T', exact: true });
-  const occupancy = await preview.locator('[data-state]').evaluateAll(elements => elements.map(element =>
-    element.getAttribute('data-state') === 'empty' ? '.' : element.getAttribute('data-piece')).join(''));
-  expect(occupancy).toBe('.T..TTT.........');
+  await expect(preview.locator('[data-state="empty"]')).toHaveCount(16);
+  await expect(preview.locator('[data-state="locked"]')).toHaveCount(4);
+  const source = await preview.locator('[data-preview-x][data-preview-y]').evaluateAll(elements => elements
+    .map(element => [Number(element.getAttribute('data-preview-x')), Number(element.getAttribute('data-preview-y')),
+      element.querySelector('[data-piece]')?.getAttribute('data-piece')])
+    .sort((a, b) => Number(a[1]) - Number(b[1]) || Number(a[0]) - Number(b[0])));
+  expect(source).toEqual([[1, 0, 'T'], [0, 1, 'T'], [1, 1, 'T'], [2, 1, 'T']]);
 }
 
 async function expectAllTextReadable(container: Locator) {
@@ -75,7 +79,13 @@ for (const width of [320, 768, 1280]) {
       await expect(status).toHaveAttribute('aria-atomic', 'true');
       await expect(status.getByRole('heading', { name: 'Готов к новой партии' })).toBeVisible();
       await expect(status).toContainText('Пока доступны начало и перезапуск партии. Движение, падение и пауза появятся позже.');
-      await expect(controls.locator('kbd')).toHaveCount(0);
+      const hints = await controls.locator('kbd').evaluateAll(keys => keys.map(key => [
+        key.textContent, key.parentElement!.textContent!.slice(key.textContent!.length),
+      ]));
+      expect(hints).toEqual([
+        ['← / →', 'Сдвинуть'], ['↑ / X', 'Повернуть вправо'], ['Z', 'Повернуть влево'],
+        ['↓', 'Мягкое падение'], ['Space', 'Сбросить фигуру'], ['P / Esc', 'Пауза'],
+      ]);
       await expect(actions).toHaveCount(2);
       await expect(actions.nth(0)).toHaveAccessibleName('Начать игру');
       await expect(actions.nth(0)).toBeEnabled();

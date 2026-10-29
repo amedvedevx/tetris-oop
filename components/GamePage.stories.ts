@@ -19,7 +19,7 @@ export default meta;
 type Story = StoryObj<GamePageProps>;
 export const StaticShell: Story = {};
 export const NewGameOnly: Story = { args: {
-  onAction: action('game-action'), availability: { actions: ['start', 'restart'], shortcuts: [] },
+  onAction: action('game-action'), availability: { actions: ['start', 'restart'] },
   statusMessage: 'Пока доступны начало и перезапуск партии. Движение, падение и пауза появятся позже.',
 } };
 export const Running: Story = { args: { data: runningScreen(), onAction: action('game-action') } };

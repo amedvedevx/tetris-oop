@@ -5,7 +5,7 @@ import { previewPieces } from './gameShell.fixtures';
 const meta = {
   title: 'Blocks/NextPiecePreview', tags: ['autodocs'], render: NextPiecePreview,
   args: { piece: null }, argTypes: { piece: { control: 'object' } },
-  parameters: { docs: { description: { component: 'The mini-board is centered horizontally in the panel. The heading and explanatory text remain left-aligned.' } } },
+  parameters: { docs: { description: { component: 'The supplied figure is centered on both axes inside the 4×4 mini-board, including half-cell offsets. Its relative geometry is preserved. The heading and explanatory text remain left-aligned.' } } },
 } satisfies Meta<NextPiecePreviewProps>;
 export default meta;
 type Story = StoryObj<NextPiecePreviewProps>;
@@ -17,3 +17,6 @@ export const S: Story = { args: { piece: previewPieces[3]! } };
 export const Z: Story = { args: { piece: previewPieces[4]! } };
 export const J: Story = { args: { piece: previewPieces[5]! } };
 export const L: Story = { args: { piece: previewPieces[6]! } };
+export const SuppliedStencil: Story = { args: { piece: {
+  kind: 'I', cells: [{ x: 2, y: 1 }, { x: 3, y: 1 }, { x: 2, y: 2 }, { x: 2, y: 3 }],
+} } };

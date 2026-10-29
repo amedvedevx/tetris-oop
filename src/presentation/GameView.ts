@@ -8,7 +8,7 @@ export class GameView {
   constructor(controller: GameController) {
     this.element = GamePage({
       data: gameScreen(controller.snapshot()),
-      availability: { actions: ['start', 'restart'], shortcuts: [] },
+      availability: { actions: ['start', 'restart'] },
       statusMessage: 'Пока доступны начало и перезапуск партии. Движение, падение и пауза появятся позже.',
       onAction: action => {
         if (action === 'start' || action === 'restart') {

@@ -12,7 +12,7 @@ export interface GameControlsProps {
 }
 export interface GameControlsAvailability {
   readonly actions: readonly GameAction[];
-  readonly shortcuts: readonly GameShortcut[];
+  readonly shortcuts?: readonly GameShortcut[];
 }
 export type GameShortcut = keyof typeof shortcuts;
 export interface GameControlsElement extends HTMLElement { update(phase: GamePhase): void }

@@ -15,4 +15,4 @@ export const Running: Story = { args: { phase: 'running' } };
 export const Paused: Story = { args: { phase: 'paused' } };
 export const GameOver: Story = { args: { phase: 'gameOver' } };
 export const Unavailable: Story = { render: ({ phase }) => GameControls({ phase }) };
-export const NewGameOnly: Story = { args: { phase: 'running', availability: { actions: ['start', 'restart'], shortcuts: [] } } };
+export const NewGameOnly: Story = { args: { phase: 'running', availability: { actions: ['start', 'restart'] } } };

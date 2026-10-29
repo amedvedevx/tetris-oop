@@ -14,7 +14,7 @@ export async function expectGameLayout(page: Page, width: number) {
     const boardCells = Array.from(board.querySelectorAll<HTMLElement>('[data-x][data-y]'), cell => ({
       ...box(cell), column: Number(cell.dataset.x), row: Number(cell.dataset.y),
     }));
-    const previewCells = Array.from(stencil.querySelectorAll('[data-state]'), (cell, index) => ({
+    const previewCells = Array.from(stencil.querySelectorAll('[data-state="empty"]'), (cell, index) => ({
       ...box(cell), column: index % 4, row: Math.floor(index / 4),
     }));
     return {
