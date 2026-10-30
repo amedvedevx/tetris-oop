@@ -16,9 +16,10 @@
     "lint": "eslint . --max-warnings 0",
     "storybook": "storybook dev --host 127.0.0.1 --port 6006 --no-open --ci",
     "build-storybook": "storybook build --quiet",
+    "build:e2e": "vite build --config tests/fixtures/new-game/vite.config.ts",
     "check": "npm run typecheck && npm run lint && npm run test:integration && npm run test:e2e",
     "test:integration": "vitest run",
-    "test:e2e": "npm run build && npm run build-storybook && playwright test"
+    "test:e2e": "npm run build && npm run build-storybook && npm run build:e2e && playwright test"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
