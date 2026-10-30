@@ -22,12 +22,19 @@ describe('composed presentation blocks', () => {
     document.body.append(NextPiecePreview({ piece }));
     const image = screen.getByRole('img', { name: `Следующая фигура: ${piece.kind}` });
     const cells = Array.from(image.querySelectorAll<HTMLElement>('[data-state]'));
-    expect(cells).toHaveLength(16);
+    expect(cells).toHaveLength(20);
     expect(screen.getAllByRole('img')).toHaveLength(1);
     expect(cells.filter(cell => cell.dataset.state === 'locked')).toHaveLength(4);
-    expect(cells.filter(cell => cell.dataset.state === 'empty')).toHaveLength(12);
-    expect(Array.from({ length: 4 }, (_, y) => cells.slice(y * 4, y * 4 + 4)
-      .map(cell => cell.dataset.state === 'empty' ? '.' : cell.dataset.piece).join(''))).toEqual(rows);
+    expect(cells.filter(cell => cell.dataset.state === 'empty')).toHaveLength(16);
+    const supplied = Array.from(image.querySelectorAll<HTMLElement>('[data-preview-x][data-preview-y]'));
+    expect(supplied).toHaveLength(4);
+    const sourceRows = Array.from({ length: 4 }, () => Array<string>(4).fill('.'));
+    for (const position of supplied) {
+      const cell = position.querySelector<HTMLElement>('[data-state="locked"]')!;
+      expect(cell).toHaveAttribute('data-piece', piece.kind);
+      sourceRows[Number(position.dataset.previewY)]![Number(position.dataset.previewX)] = cell.dataset.piece!;
+    }
+    expect(sourceRows.map(row => row.join(''))).toEqual(rows);
     for (const cell of cells) {
       expect(cell).toHaveAttribute('aria-hidden', 'true');
       if (cell.dataset.state === 'empty') expect(cell).not.toHaveAttribute('data-piece');

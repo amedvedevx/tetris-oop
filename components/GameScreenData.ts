@@ -1,6 +1,6 @@
 import type { CellContent, PieceKind } from './BoardCell';
 
-/** Presentation data only. The game engine will supply these snapshots later. */
+/** Presentation data only. The presentation adapter translates domain snapshots into this contract. */
 export const gamePhases = ['ready', 'running', 'paused', 'gameOver'] as const;
 export type GamePhase = typeof gamePhases[number];
 export type GameAction = 'start' | 'pause' | 'resume' | 'restart';
