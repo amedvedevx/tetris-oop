@@ -3,6 +3,8 @@ dist/
 storybook-static/
 .runtime/
 .cache/
+/.local/
+/docs/reviews/
 *.tsbuildinfo
 playwright-report/
 test-results/
