@@ -1,5 +1,5 @@
 import { GamePage, type GamePageElement } from '../../components/GamePage';
-import type { GameCommand, GameController } from '../application/GameController';
+import { gameCommands, isGameCommand, type GameCommand, type GameController } from '../application/GameController';
 import { KeyboardController } from './KeyboardController';
 import { gameScreen } from './gameScreen';
 
@@ -11,12 +11,10 @@ export class GameView {
   constructor(private readonly controller: GameController) {
     this.element = GamePage({
       data: gameScreen(controller.snapshot()),
-      availability: { actions: ['start', 'restart', 'moveLeft', 'moveRight'] },
+      availability: { actions: gameCommands },
       statusMessage: 'Доступны начало, перезапуск и движение влево/вправо. Повороты, падение и пауза появятся позже.',
       onAction: action => {
-        if (action === 'start' || action === 'restart' || action === 'moveLeft' || action === 'moveRight') {
-          this.perform(action);
-        }
+        if (isGameCommand(action)) this.perform(action);
       },
     });
     this.#keyboard = new KeyboardController(this.element, command => {

@@ -1,8 +1,14 @@
 import { GameSession, type GameSnapshot } from '../domain/GameSession';
 
-export type MovementCommand = 'moveLeft' | 'moveRight';
-export type GameCommand = 'start' | 'restart' | MovementCommand;
+const movementCommands = ['moveLeft', 'moveRight'] as const;
+export const gameCommands = Object.freeze(['start', 'restart', ...movementCommands] as const);
+export type MovementCommand = (typeof movementCommands)[number];
+export type GameCommand = (typeof gameCommands)[number];
 export interface GameState extends GameSnapshot { readonly highScore: number }
+
+export function isGameCommand(command: string): command is GameCommand {
+  return gameCommands.some(supported => supported === command);
+}
 
 export class GameController {
   constructor(private readonly session: GameSession, private readonly highScore = 0) {}
