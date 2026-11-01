@@ -2,7 +2,8 @@ import { Board, type BoardSnapshot } from './Board';
 import type { PieceCells, PieceKind } from './pieces';
 import type { RandomSource } from './RandomSource';
 import { SevenBag } from './SevenBag';
-import { Tetromino } from './Tetromino';
+import type { Figure } from './figures/Figure';
+import { createFigure } from './figures/createFigure';
 
 export interface GameSnapshot {
   readonly phase: 'ready' | 'running';
@@ -17,7 +18,7 @@ export interface GameSnapshot {
 export class GameSession {
   #board = new Board();
   #queue: SevenBag;
-  #active: Tetromino | null = null;
+  #active: Figure | null = null;
 
   constructor(private readonly random: RandomSource) {
     this.#queue = new SevenBag(random);
@@ -33,7 +34,7 @@ export class GameSession {
 
   move(direction: 'left' | 'right'): void {
     if (!this.#active) return;
-    const candidate = this.#active.translated(direction === 'left' ? -1 : 1, 0);
+    const candidate = direction === 'left' ? this.#active.moveLeft() : this.#active.moveRight();
     if (this.#board.canPlace(candidate.cells())) this.#active = candidate;
   }
 
@@ -50,7 +51,7 @@ export class GameSession {
   private beginNewGame(): void {
     // Build the complete new state first. A failed random source leaves the current game intact.
     const queue = new SevenBag(this.random);
-    const active = new Tetromino(queue.take());
+    const active = createFigure(queue.take());
     queue.peek();
     this.#board = new Board();
     this.#queue = queue;

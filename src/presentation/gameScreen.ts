@@ -1,7 +1,7 @@
 import type { CellContent } from '../../components/BoardCell';
 import type { GameScreenData } from '../../components/GameScreenData';
 import type { GameState } from '../application/GameController';
-import { initialPieceCells } from '../domain/pieces';
+import { createFigure } from '../domain/figures/createFigure';
 
 /** Translate detached domain data; never put the active figure into the locked board. */
 export function gameScreen(snapshot: GameState): GameScreenData {
@@ -15,7 +15,7 @@ export function gameScreen(snapshot: GameState): GameScreenData {
   return {
     phase: snapshot.phase,
     cells,
-    next: snapshot.next ? { kind: snapshot.next, cells: initialPieceCells(snapshot.next) } : null,
+    next: snapshot.next ? { kind: snapshot.next, cells: createFigure(snapshot.next).localCells() } : null,
     metrics: { score: snapshot.score, lines: snapshot.lines, level: snapshot.level, highScore: snapshot.highScore },
   };
 }
