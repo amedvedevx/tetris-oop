@@ -15,11 +15,21 @@ export interface GamePageProps {
 }
 export interface GamePageElement extends HTMLDivElement { update(data: GameScreenData): void }
 
+/** Prepare every replaceable part before making any visible change. */
+function prepareSnapshot(data: GameScreenData) {
+  return {
+    board: GameBoard({ cells: data.cells }),
+    stats: GameStats(data.metrics),
+    preview: NextPiecePreview({ piece: data.next }),
+  };
+}
+
 export function GamePage({ data, onAction, availability, statusMessage }: GamePageProps): GamePageElement {
   const notice = statusMessage ?? (onAction ? undefined : 'Это демонстрация интерфейса: можно изучить поле и управление.');
-  const board = Wrapper({ maxWidth: 'board', width: 'full', children: [GameBoard({ cells: data.cells })] });
-  const stats = Wrapper({ display: 'grid', children: [GameStats(data.metrics)] });
-  const preview = Wrapper({ display: 'grid', children: [NextPiecePreview({ piece: data.next })] });
+  const snapshot = prepareSnapshot(data);
+  const board = Wrapper({ maxWidth: 'board', width: 'full', children: [snapshot.board] });
+  const stats = Wrapper({ display: 'grid', children: [snapshot.stats] });
+  const preview = Wrapper({ display: 'grid', children: [snapshot.preview] });
   const status = GameStatus({ phase: data.phase, ...(notice !== undefined ? { message: notice } : {}) });
   const controls = GameControls({ phase: data.phase, ...(onAction ? { onAction } : {}), ...(availability ? { availability } : {}) });
   const element = document.createElement('div');
@@ -43,13 +53,10 @@ export function GamePage({ data, onAction, availability, statusMessage }: GamePa
   ] }));
   return Object.assign(element, {
     update(next: GameScreenData) {
-      // Validate board and preview shapes before committing their DOM replacements.
-      const nextBoard = GameBoard({ cells: next.cells });
-      const nextStats = GameStats(next.metrics);
-      const nextPreview = NextPiecePreview({ piece: next.next });
-      board.replaceChildren(nextBoard);
-      stats.replaceChildren(nextStats);
-      preview.replaceChildren(nextPreview);
+      const prepared = prepareSnapshot(next);
+      board.replaceChildren(prepared.board);
+      stats.replaceChildren(prepared.stats);
+      preview.replaceChildren(prepared.preview);
       status.update(next.phase, notice);
       controls.update(next.phase);
     },

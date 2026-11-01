@@ -28,6 +28,10 @@ const shortcuts = {
   move: ['← / →', 'Сдвинуть'], rotateRight: ['↑ / X', 'Повернуть вправо'], rotateLeft: ['Z', 'Повернуть влево'],
   softDrop: ['↓', 'Мягкое падение'], hardDrop: ['Space', 'Сбросить фигуру'], pause: ['P / Esc', 'Пауза'],
 } as const;
+const movementActions = [
+  { action: 'moveLeft', label: '←', ariaLabel: 'Сдвинуть фигуру влево' },
+  { action: 'moveRight', label: '→', ariaLabel: 'Сдвинуть фигуру вправо' },
+] as const;
 
 export function GameControls({ phase, onAction, availability }: GameControlsProps): GameControlsElement {
   let current = phase;
@@ -38,40 +42,51 @@ export function GameControls({ phase, onAction, availability }: GameControlsProp
     const action = actions[current][slot];
     if (action && enabled(action)) onAction?.(action.action);
   };
-  const primary = Button({ label: actions[phase].primary.label, fullWidth: true, disabled: !enabled(actions[phase].primary), onClick: () => dispatch('primary') });
-  const secondary = Button({ label: actions[phase].secondary?.label ?? 'Пауза', variant: 'secondary', fullWidth: true, disabled: !enabled(actions[phase].secondary), onClick: () => dispatch('secondary') });
+  const phaseButtons = (['primary', 'secondary'] as const).map(slot => ({
+    slot,
+    button: Button({
+      label: actions[phase][slot]?.label ?? 'Пауза',
+      variant: slot === 'primary' ? 'primary' : 'secondary', fullWidth: true,
+      disabled: !enabled(actions[phase][slot]), onClick: () => dispatch(slot),
+    }),
+  }));
   const canMove = (action: GameAction) => current === 'running' && Boolean(onAction) && allowed.has(action);
-  const movement = allowed.has('moveLeft') || allowed.has('moveRight') ? [
-    { action: 'moveLeft' as const, label: '←', ariaLabel: 'Сдвинуть фигуру влево' },
-    { action: 'moveRight' as const, label: '→', ariaLabel: 'Сдвинуть фигуру вправо' },
-  ].map(({ action, label, ariaLabel }) => ({
+  const movement = allowed.has('moveLeft') || allowed.has('moveRight') ? movementActions.map(({ action, label, ariaLabel }) => ({
     action,
     button: Button({
       label, ariaLabel, variant: 'secondary', size: 'small', fullWidth: true, disabled: !canMove(action),
       onClick: () => { if (canMove(action)) onAction?.(action); },
     }),
   })) : [];
+  const children = [
+    Typography({ as: 'h2', variant: 'label', text: 'Управление' }),
+    Wrapper({ gap: 'sm', children: phaseButtons.map(({ button }) => button) }),
+  ];
+  if (movement.length) {
+    children.push(Wrapper({ display: 'grid', columns: 2, gap: 'sm', children: movement.map(({ button }) => button) }));
+  }
+  if (!onAction) {
+    children.push(Typography({ variant: 'caption', tone: 'muted', text: 'Демонстрация интерфейса. Управление пока недоступно.' }));
+  }
+  if (hints.length) {
+    children.push(Wrapper({ gap: 'sm', children: hints.map(([key, description]) => Wrapper({
+      dir: 'row', gap: 'md', align: 'center', justify: 'between', children: [
+        KeyHint({ key }), Typography({ variant: 'caption', tone: 'muted', text: description }),
+      ],
+    })) }));
+  }
   const element = Surface({
     as: 'section', size: 'compact', ariaLabel: 'Управление',
-    children: [Wrapper({ gap: 'md', children: [
-      Typography({ as: 'h2', variant: 'label', text: 'Управление' }),
-      Wrapper({ gap: 'sm', children: [primary, secondary] }),
-      ...(movement.length ? [Wrapper({ display: 'grid', columns: 2, gap: 'sm', children: movement.map(({ button }) => button) })] : []),
-      ...(!onAction ? [Typography({ variant: 'caption', tone: 'muted', text: 'Демонстрация интерфейса. Управление пока недоступно.' })] : []),
-      ...(hints.length ? [Wrapper({ gap: 'sm', children: hints.map(([key, description]) => Wrapper({
-        dir: 'row', gap: 'md', align: 'center', justify: 'between', children: [
-          KeyHint({ key }), Typography({ variant: 'caption', tone: 'muted', text: description }),
-        ],
-      })) })] : []),
-    ] })],
+    children: [Wrapper({ gap: 'md', children })],
   });
   return Object.assign(element, {
     update(next: GamePhase) {
       current = next;
-      primary.setLabel(actions[next].primary.label);
-      primary.disabled = !enabled(actions[next].primary);
-      secondary.setLabel(actions[next].secondary?.label ?? 'Пауза');
-      secondary.disabled = !enabled(actions[next].secondary);
+      for (const { slot, button } of phaseButtons) {
+        const action = actions[next][slot];
+        button.setLabel(action?.label ?? 'Пауза');
+        button.disabled = !enabled(action);
+      }
       for (const { action, button } of movement) button.disabled = !canMove(action);
     },
   });
