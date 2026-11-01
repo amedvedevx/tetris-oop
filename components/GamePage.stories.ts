@@ -28,3 +28,13 @@ export const GameOver: Story = { args: { data: gameOverScreen(), onAction: actio
 export const LargeValues: Story = {
   args: { data: { ...runningScreen(), metrics: { score: 123456789012345, lines: 123456, level: 12345, highScore: 999999999999999 } } },
 };
+const movementArgs = {
+  onAction: action('game-action'), availability: { actions: ['start', 'restart', 'moveLeft', 'moveRight'] as const },
+  statusMessage: 'Доступны начало, перезапуск и движение влево/вправо. Повороты, падение и пауза появятся позже.',
+};
+export const MovementReady: Story = { args: movementArgs };
+export const MovementRunning: Story = { args: { ...movementArgs, data: runningScreen() } };
+export const MovementLongMessage: Story = { args: {
+  ...movementArgs, data: runningScreen(),
+  statusMessage: 'После начала партии двигайте фигуру кнопками или стрелками влево и вправо, когда фокус находится внутри игры. Фигура останавливается у границ поля и закреплённых клеток. Повороты, падение и пауза появятся позже.',
+} };

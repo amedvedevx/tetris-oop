@@ -78,7 +78,7 @@ for (const width of [320, 768, 1280]) {
       await expect(status).toHaveAttribute('aria-live', 'polite');
       await expect(status).toHaveAttribute('aria-atomic', 'true');
       await expect(status.getByRole('heading', { name: 'Готов к новой партии' })).toBeVisible();
-      await expect(status).toContainText('Пока доступны начало и перезапуск партии. Движение, падение и пауза появятся позже.');
+      await expect(status).toContainText('Доступны начало, перезапуск и движение влево/вправо. Повороты, падение и пауза появятся позже.');
       const hints = await controls.locator('kbd').evaluateAll(keys => keys.map(key => [
         key.textContent, key.parentElement!.textContent!.slice(key.textContent!.length),
       ]));
@@ -86,20 +86,26 @@ for (const width of [320, 768, 1280]) {
         ['← / →', 'Сдвинуть'], ['↑ / X', 'Повернуть вправо'], ['Z', 'Повернуть влево'],
         ['↓', 'Мягкое падение'], ['Space', 'Сбросить фигуру'], ['P / Esc', 'Пауза'],
       ]);
-      await expect(actions).toHaveCount(2);
+      await expect(actions).toHaveCount(4);
       await expect(actions.nth(0)).toHaveAccessibleName('Начать игру');
       await expect(actions.nth(0)).toBeEnabled();
       await expect(actions.nth(1)).toHaveAccessibleName('Пауза');
       await expect(actions.nth(1)).toBeDisabled();
+      await expect(actions.nth(2)).toHaveAccessibleName('Сдвинуть фигуру влево');
+      await expect(actions.nth(2)).toBeDisabled();
+      await expect(actions.nth(3)).toHaveAccessibleName('Сдвинуть фигуру вправо');
+      await expect(actions.nth(3)).toBeDisabled();
     };
     await expectReady();
     // Reach the enabled Start from a fresh page before a disabled pointer click can affect tab order.
     await page.keyboard.press('Tab');
     await expect(actions.nth(0)).toBeFocused();
-    await actions.nth(1).scrollIntoViewIfNeeded();
-    const box = (await actions.nth(1).boundingBox())!;
-    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-    await expectReady();
+    for (const index of [1, 2, 3]) {
+      await actions.nth(index).scrollIntoViewIfNeeded();
+      const box = (await actions.nth(index).boundingBox())!;
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+      await expectReady();
+    }
     await expectGameLayout(page, width);
     await page.reload();
     await expectReady();
