@@ -40,11 +40,23 @@ export function GameControls({ phase, onAction, availability }: GameControlsProp
   };
   const primary = Button({ label: actions[phase].primary.label, fullWidth: true, disabled: !enabled(actions[phase].primary), onClick: () => dispatch('primary') });
   const secondary = Button({ label: actions[phase].secondary?.label ?? 'Пауза', variant: 'secondary', fullWidth: true, disabled: !enabled(actions[phase].secondary), onClick: () => dispatch('secondary') });
+  const canMove = (action: GameAction) => current === 'running' && Boolean(onAction) && allowed.has(action);
+  const movement = allowed.has('moveLeft') || allowed.has('moveRight') ? [
+    { action: 'moveLeft' as const, label: '←', ariaLabel: 'Сдвинуть фигуру влево' },
+    { action: 'moveRight' as const, label: '→', ariaLabel: 'Сдвинуть фигуру вправо' },
+  ].map(({ action, label, ariaLabel }) => ({
+    action,
+    button: Button({
+      label, ariaLabel, variant: 'secondary', size: 'small', fullWidth: true, disabled: !canMove(action),
+      onClick: () => { if (canMove(action)) onAction?.(action); },
+    }),
+  })) : [];
   const element = Surface({
     as: 'section', size: 'compact', ariaLabel: 'Управление',
     children: [Wrapper({ gap: 'md', children: [
       Typography({ as: 'h2', variant: 'label', text: 'Управление' }),
       Wrapper({ gap: 'sm', children: [primary, secondary] }),
+      ...(movement.length ? [Wrapper({ display: 'grid', columns: 2, gap: 'sm', children: movement.map(({ button }) => button) })] : []),
       ...(!onAction ? [Typography({ variant: 'caption', tone: 'muted', text: 'Демонстрация интерфейса. Управление пока недоступно.' })] : []),
       ...(hints.length ? [Wrapper({ gap: 'sm', children: hints.map(([key, description]) => Wrapper({
         dir: 'row', gap: 'md', align: 'center', justify: 'between', children: [
@@ -60,6 +72,7 @@ export function GameControls({ phase, onAction, availability }: GameControlsProp
       primary.disabled = !enabled(actions[next].primary);
       secondary.setLabel(actions[next].secondary?.label ?? 'Пауза');
       secondary.disabled = !enabled(actions[next].secondary);
+      for (const { action, button } of movement) button.disabled = !canMove(action);
     },
   });
 }

@@ -23,6 +23,8 @@ export function GamePage({ data, onAction, availability, statusMessage }: GamePa
   const status = GameStatus({ phase: data.phase, ...(notice !== undefined ? { message: notice } : {}) });
   const controls = GameControls({ phase: data.phase, ...(onAction ? { onAction } : {}), ...(availability ? { availability } : {}) });
   const element = document.createElement('div');
+  // Pointer interaction can focus the game area without adding a stop before Start in tab order.
+  element.tabIndex = -1;
   element.className = 'min-h-screen bg-surface-muted';
   element.append(Wrapper({ align: 'center', children: [
     Wrapper({ as: 'main', maxWidth: 'game', width: 'full', padding: { base: 'md', md: 'xl' }, gap: 'lg', children: [

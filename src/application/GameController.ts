@@ -1,6 +1,7 @@
 import { GameSession, type GameSnapshot } from '../domain/GameSession';
 
-export type GameCommand = 'start' | 'restart';
+export type MovementCommand = 'moveLeft' | 'moveRight';
+export type GameCommand = 'start' | 'restart' | MovementCommand;
 export interface GameState extends GameSnapshot { readonly highScore: number }
 
 export class GameController {
@@ -11,8 +12,12 @@ export class GameController {
   }
 
   dispatch(command: GameCommand): GameState {
-    if (command === 'start') this.session.start();
-    else this.session.restart();
+    switch (command) {
+      case 'start': this.session.start(); break;
+      case 'restart': this.session.restart(); break;
+      case 'moveLeft': this.session.move('left'); break;
+      case 'moveRight': this.session.move('right'); break;
+    }
     return this.snapshot();
   }
 }

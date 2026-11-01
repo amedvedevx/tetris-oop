@@ -3,7 +3,7 @@ import type { CellContent, PieceKind } from './BoardCell';
 /** Presentation data only. The presentation adapter translates domain snapshots into this contract. */
 export const gamePhases = ['ready', 'running', 'paused', 'gameOver'] as const;
 export type GamePhase = typeof gamePhases[number];
-export type GameAction = 'start' | 'pause' | 'resume' | 'restart';
+export type GameAction = 'start' | 'pause' | 'resume' | 'restart' | 'moveLeft' | 'moveRight';
 export type BoardCells = readonly (readonly CellContent[])[];
 export interface PreviewPoint { readonly x: number; readonly y: number }
 export interface PreviewPiece {

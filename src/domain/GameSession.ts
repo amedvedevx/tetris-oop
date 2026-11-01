@@ -31,6 +31,12 @@ export class GameSession {
     if (this.#active) this.beginNewGame();
   }
 
+  move(direction: 'left' | 'right'): void {
+    if (!this.#active) return;
+    const candidate = this.#active.translated(direction === 'left' ? -1 : 1, 0);
+    if (this.#board.canPlace(candidate.cells())) this.#active = candidate;
+  }
+
   snapshot(): GameSnapshot {
     return {
       phase: this.#active ? 'running' : 'ready',

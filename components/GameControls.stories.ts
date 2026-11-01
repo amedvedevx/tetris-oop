@@ -16,3 +16,11 @@ export const Paused: Story = { args: { phase: 'paused' } };
 export const GameOver: Story = { args: { phase: 'gameOver' } };
 export const Unavailable: Story = { render: ({ phase }) => GameControls({ phase }) };
 export const NewGameOnly: Story = { args: { phase: 'running', availability: { actions: ['start', 'restart'] } } };
+const movementAvailability = { actions: ['start', 'restart', 'moveLeft', 'moveRight'] as const };
+export const MovementReady: Story = { args: { availability: movementAvailability } };
+export const MovementRunning: Story = { args: { phase: 'running', availability: movementAvailability } };
+export const MovementPaused: Story = { args: { phase: 'paused', availability: movementAvailability } };
+export const MovementUnavailable: Story = {
+  render: ({ phase }) => GameControls({ phase, availability: movementAvailability }),
+  args: { phase: 'running' },
+};

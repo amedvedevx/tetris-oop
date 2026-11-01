@@ -10,3 +10,4 @@ if (!root) throw new Error('Application root #app is missing');
 const session = new GameSession(new MathRandomSource());
 const view = new GameView(new GameController(session));
 root.replaceChildren(view.element);
+if (import.meta.hot) import.meta.hot.dispose(() => view.dispose());
