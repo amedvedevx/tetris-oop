@@ -17,6 +17,10 @@ export class GameController {
     return { ...this.session.snapshot(), highScore: this.highScore };
   }
 
+  elapsedMs(): number {
+    return this.session.elapsedMs();
+  }
+
   dispatch(command: GameCommand): GameState {
     switch (command) {
       case 'start': this.session.start(); break;

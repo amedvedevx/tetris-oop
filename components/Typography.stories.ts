@@ -35,3 +35,14 @@ export const Inverse: Story = {
   args: { tone: 'inverse', text: 'Читаемый текст на тёмной поверхности' },
   render: args => Surface({ variant: 'inverted', children: [Typography(args)] }),
 };
+export const ReadoutLabel: Story = {
+  args: { as: 'span', variant: 'readoutLabel', tone: 'inverseMuted', text: 'score' },
+  render: args => Surface({ variant: 'inverted', children: [Typography(args)] }),
+};
+export const ReadoutValue: Story = {
+  args: { as: 'span', variant: 'readoutValue', tone: 'inverse', text: '100:00' },
+  render: args => Surface({ variant: 'inverted', children: [Typography(args)] }),
+};
+export const LongReadout: Story = {
+  ...ReadoutValue, args: { ...ReadoutValue.args, text: '123456789012345' },
+};

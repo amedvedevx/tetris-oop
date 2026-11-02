@@ -9,6 +9,11 @@ import { expectCenteredPreview } from './preview-layout';
 
 const controlledUrl = 'http://127.0.0.1:4181/tests/fixtures/new-game/';
 
+async function freezeTime(page: Page) {
+  await page.clock.install({ time: new Date('2026-11-01T00:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-11-01T01:00:00Z'));
+}
+
 async function expectReady(page: Page) {
   await expect(page.getByRole('status')).toHaveAttribute('data-phase', 'ready');
   const board = page.getByRole('img', { name: 'Игровое поле: 10 столбцов, 20 строк', exact: true });
@@ -26,7 +31,7 @@ async function expectReady(page: Page) {
 async function expectMetrics(page: Page) {
   const actual = await page.getByRole('region', { name: 'Показатели партии', exact: true }).locator('dl').evaluateAll(items =>
     items.map(item => [item.querySelector('dt')?.textContent, item.querySelector('dd')?.textContent]));
-  expect(actual).toEqual([['Очки', '0'], ['Рекорд', '0'], ['Линии', '0'], ['Уровень', '1']]);
+  expect(actual).toEqual([['score', '0000'], ['time', '00:00']]);
 }
 
 async function expectRunning(page: Page, kind: PieceKind, next: PieceKind, width: number) {
@@ -49,6 +54,7 @@ async function expectRunning(page: Page, kind: PieceKind, next: PieceKind, width
 
 for (const width of [320, 768, 1280]) {
   test(`controlled new-game flow preserves real state, preview and focus at ${width}px`, async ({ page }) => {
+    await freezeTime(page);
     await page.setViewportSize({ width, height: 1000 });
     expect((await page.goto(controlledUrl))?.ok()).toBe(true);
     await expect(page).toHaveTitle('Tetris OOP — controlled test entry');
@@ -82,6 +88,7 @@ for (const width of [320, 768, 1280]) {
 }
 
 test('ordinary production bootstrap starts, restarts and reloads without a controlled entry', async ({ page }) => {
+  await freezeTime(page);
   await page.setViewportSize({ width: 1280, height: 1000 });
   expect((await page.goto('http://127.0.0.1:4180/'))?.ok()).toBe(true);
   await expect(page).toHaveTitle('Tetris OOP');

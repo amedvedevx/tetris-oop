@@ -12,7 +12,7 @@ const meta = {
   },
   parameters: {
     layout: 'fullscreen', fullPage: true,
-    docs: { description: { component: 'Content-sized panels align in the two-column layout. Status follows the board width; the status and controls share a bottom edge. On narrow screens the blocks stack without fixed heights.' } },
+    docs: { description: { component: 'Score and time share a compact dark footer directly below the board. Preview and controls occupy the right column; narrow screens stack the blocks. Time-only updates preserve the board, preview, status and focused controls.' } },
   },
 } satisfies Meta<GamePageProps>;
 export default meta;
@@ -26,7 +26,7 @@ export const Running: Story = { args: { data: runningScreen(), onAction: action(
 export const Paused: Story = { args: { data: { ...runningScreen(), phase: 'paused' }, onAction: action('game-action') } };
 export const GameOver: Story = { args: { data: gameOverScreen(), onAction: action('game-action') } };
 export const LargeValues: Story = {
-  args: { data: { ...runningScreen(), metrics: { score: 123456789012345, lines: 123456, level: 12345, highScore: 999999999999999 } } },
+  args: { data: { ...runningScreen(), metrics: { score: 123456789012345, elapsedMs: 6_000_000 } } },
 };
 const movementArgs = {
   onAction: action('game-action'), availability: { actions: ['start', 'restart', 'moveLeft', 'moveRight'] as const },

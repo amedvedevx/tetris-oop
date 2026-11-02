@@ -12,9 +12,7 @@ export interface PreviewPiece {
 }
 export interface GameMetrics {
   readonly score: number;
-  readonly lines: number;
-  readonly level: number;
-  readonly highScore: number;
+  readonly elapsedMs: number;
 }
 export interface GameScreenData {
   readonly phase: GamePhase;
