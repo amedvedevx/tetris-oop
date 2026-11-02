@@ -25,11 +25,11 @@ export function sampleBoard(): BoardCells {
 }
 
 export function readyScreen(): GameScreenData {
-  return { phase: 'ready', cells: emptyBoard(), next: null, metrics: { score: 0, lines: 0, level: 1, highScore: 0 } };
+  return { phase: 'ready', cells: emptyBoard(), next: null, metrics: { score: 0, elapsedMs: 0 } };
 }
 
 export function runningScreen(): GameScreenData {
-  return { phase: 'running', cells: sampleBoard(), next: previewPieces[2]!, metrics: { score: 1240, lines: 8, level: 1, highScore: 6800 } };
+  return { phase: 'running', cells: sampleBoard(), next: previewPieces[2]!, metrics: { score: 1240, elapsedMs: 3000 } };
 }
 
 export function gameOverScreen(): GameScreenData {

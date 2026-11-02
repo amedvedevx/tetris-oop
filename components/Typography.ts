@@ -1,7 +1,7 @@
 export const typographyOptions = {
   tags: ['h1', 'h2', 'h3', 'p', 'span'],
-  variants: ['title', 'heading', 'body', 'caption', 'label', 'metric'],
-  tones: ['default', 'muted', 'inverse', 'accent', 'danger'],
+  variants: ['title', 'heading', 'body', 'caption', 'label', 'metric', 'readoutLabel', 'readoutValue'],
+  tones: ['default', 'muted', 'inverse', 'inverseMuted', 'accent', 'danger'],
   live: ['off', 'polite', 'assertive'],
 } as const;
 export type TypographyTag = typeof typographyOptions.tags[number];
@@ -19,18 +19,21 @@ export interface TypographyProps {
 }
 
 const variants: Record<TypographyVariant, string> = {
-  title: 'text-title font-bold tracking-tight',
-  heading: 'text-heading font-semibold',
-  body: 'text-body font-normal',
-  caption: 'text-caption font-normal',
-  label: 'text-label font-semibold',
-  metric: 'text-metric font-bold tabular-nums tracking-tight',
+  title: 'font-sans text-title font-bold tracking-tight',
+  heading: 'font-sans text-heading font-semibold',
+  body: 'font-sans text-body font-normal',
+  caption: 'font-sans text-caption font-normal',
+  label: 'font-sans text-label font-semibold',
+  metric: 'font-sans text-metric font-bold tabular-nums tracking-tight',
+  readoutLabel: 'font-mono text-xs leading-5 font-medium sm:text-sm',
+  readoutValue: 'font-mono text-sm leading-5 font-semibold tabular-nums sm:text-base',
 };
 
 const tones: Record<TypographyTone, string> = {
   default: 'text-ink',
   muted: 'text-muted',
   inverse: 'text-inverse',
+  inverseMuted: 'text-inverse-muted',
   accent: 'text-accent',
   danger: 'text-danger',
 };
@@ -45,7 +48,7 @@ export function Typography({
   live,
 }: TypographyProps): HTMLElement {
   const element = document.createElement(as);
-  element.className = `m-0 min-w-0 max-w-full font-sans [overflow-wrap:anywhere] ${variants[variant]} ${tones[tone]}`;
+  element.className = `m-0 min-w-0 max-w-full [overflow-wrap:anywhere] ${variants[variant]} ${tones[tone]}`;
   element.textContent = String(text);
   if (id) element.id = id;
   if (ariaLabel) element.setAttribute('aria-label', ariaLabel);

@@ -34,24 +34,20 @@ export async function expectGameLayout(page: Page, width: number) {
   }
   expect(Math.abs(layout.board.x - layout.status.x)).toBeLessThan(1);
   expect(Math.abs(layout.board.right - layout.status.right)).toBeLessThan(1);
-  expect(layout.status.y).toBeGreaterThanOrEqual(layout.board.bottom);
+  expect(Math.abs(layout.stats.x - layout.board.x)).toBeLessThan(1);
+  expect(Math.abs(layout.stats.right - layout.board.right)).toBeLessThan(1);
+  expect(Math.abs(layout.stats.y - layout.board.bottom)).toBeLessThan(1);
+  expect(layout.status.y).toBeGreaterThanOrEqual(layout.stats.bottom);
   expect(Math.abs(layout.stencil.x + layout.stencil.width / 2 - layout.preview.x - layout.preview.width / 2)).toBeLessThan(1);
   expect(Math.abs(layout.previewHeading.x - layout.previewDetail.x)).toBeLessThan(1);
   expect(layout.previewHeading.x).toBeLessThanOrEqual(layout.stencil.x + 1);
   if (width === 320) {
-    expect(layout.stats.y).toBeGreaterThanOrEqual(layout.status.bottom);
-    expect(layout.preview.y).toBeGreaterThanOrEqual(layout.stats.bottom);
+    expect(layout.preview.y).toBeGreaterThanOrEqual(layout.status.bottom);
   } else {
-    expect(layout.stats.x).toBeGreaterThanOrEqual(layout.board.right);
+    expect(layout.preview.x).toBeGreaterThanOrEqual(layout.board.right);
     expect(layout.controls.x).toBeGreaterThanOrEqual(layout.board.right);
     expect(Math.abs(layout.status.bottom - layout.controls.bottom)).toBeLessThan(1);
-    if (width === 768) {
-      expect(layout.preview.y).toBeGreaterThanOrEqual(layout.stats.bottom);
-    } else {
-      expect(layout.preview.x).toBeGreaterThanOrEqual(layout.stats.right);
-      expect(Math.abs(layout.preview.y - layout.stats.y)).toBeLessThan(1);
-      expect(Math.abs(layout.preview.height - layout.stats.height)).toBeLessThan(1);
-    }
+    expect(Math.abs(layout.preview.y - layout.board.y)).toBeLessThan(1);
   }
   expect(layout.controls.y).toBeGreaterThanOrEqual(layout.preview.bottom);
 

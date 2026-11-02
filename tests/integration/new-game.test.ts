@@ -1,15 +1,25 @@
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { GameController, type GameState } from '../../src/application/GameController';
 import { GameSession } from '../../src/domain/GameSession';
 import type { PieceKind } from '../../src/domain/pieces';
 import { GameView } from '../../src/presentation/GameView';
 import { gameScreen } from '../../src/presentation/gameScreen';
 import { ScriptedRandom } from '../fixtures/ScriptedRandom';
+import { ManualClock } from '../fixtures/ManualClock';
+import { ManualTicker } from '../fixtures/ManualTicker';
 import { identityBag, jBag, lBag, shapes, sortedCoordinates, starts, upper } from '../fixtures/new-game-data';
 
 const emptyBoard = () => Array.from({ length: 20 }, () => Array<null>(10).fill(null));
+const views: GameView[] = [];
+afterEach(() => { views.forEach(view => view.dispose()); views.length = 0; });
+
+function createView(controller: GameController) {
+  const view = new GameView(controller, new ManualTicker());
+  views.push(view);
+  return view;
+}
 
 function expectState(state: GameState, kind: PieceKind, next: PieceKind, highScore = 9800) {
   expect(state.phase).toBe('running');
@@ -20,7 +30,7 @@ function expectState(state: GameState, kind: PieceKind, next: PieceKind, highSco
   expect([state.score, state.lines, state.level, state.highScore]).toEqual([0, 0, 1, highScore]);
 }
 
-function expectVisibleState(element: HTMLElement, kind: PieceKind, next: PieceKind, highScore = '9800') {
+function expectVisibleState(element: HTMLElement, kind: PieceKind, next: PieceKind) {
   const query = within(element);
   const board = query.getByRole('img', { name: 'Игровое поле: 10 столбцов, 20 строк' });
   expect(board.querySelectorAll('[data-x][data-y]')).toHaveLength(200);
@@ -39,7 +49,7 @@ function expectVisibleState(element: HTMLElement, kind: PieceKind, next: PieceKi
   for (const cell of preview.querySelectorAll('[data-state="locked"]')) expect(cell).toHaveAttribute('data-piece', next);
   const values = Array.from(query.getByRole('region', { name: 'Показатели партии' }).querySelectorAll('dl'))
     .map(item => [item.querySelector('dt')?.textContent, item.querySelector('dd')?.textContent]);
-  expect(values).toEqual([['Очки', '0'], ['Рекорд', highScore], ['Линии', '0'], ['Уровень', '1']]);
+  expect(values).toEqual([['score', '0000'], ['time', '00:00']]);
   expect(query.getByRole('status')).toHaveAttribute('data-phase', 'running');
   expect(query.getByRole('button', { name: 'Пауза' })).toBeDisabled();
 }
@@ -47,13 +57,13 @@ function expectVisibleState(element: HTMLElement, kind: PieceKind, next: PieceKi
 describe('new game through real view, controller and domain objects', () => {
   it.each(starts)('starts $kind with $next next from a clean ready screen', async ({ kind, next, random: values }) => {
     const random = new ScriptedRandom(values);
-    const controller = new GameController(new GameSession(random), 9800);
-    const view = new GameView(controller);
+    const controller = new GameController(new GameSession(random, new ManualClock()), 9800);
+    const view = createView(controller);
     document.body.append(view.element);
     const query = within(view.element);
     const start = query.getByRole('button', { name: 'Начать игру' });
     const status = query.getByRole('status');
-    expect(controller.snapshot()).toEqual({ phase: 'ready', board: emptyBoard(), active: null, next: null, score: 0, lines: 0, level: 1, highScore: 9800 });
+    expect(controller.snapshot()).toEqual({ phase: 'ready', board: emptyBoard(), active: null, next: null, score: 0, lines: 0, level: 1, highScore: 9800, elapsedMs: 0 });
     expect(query.getByRole('img', { name: 'Игровое поле: 10 столбцов, 20 строк' }).querySelectorAll('[data-state="empty"]')).toHaveLength(200);
     expect(query.getByRole('img', { name: 'Следующая фигура ещё не выбрана' }).querySelectorAll('[data-state="empty"]')).toHaveLength(16);
     expect(start).toBeEnabled();
@@ -71,10 +81,10 @@ describe('new game through real view, controller and domain objects', () => {
 
   it('discards the old queue on each restart, preserves high score and makes reads/phase guards non-consuming', async () => {
     const random = new ScriptedRandom([...identityBag, ...lBag, ...jBag]);
-    const controller = new GameController(new GameSession(random), 9800);
+    const controller = new GameController(new GameSession(random, new ManualClock()), 9800);
     expect(controller.dispatch('restart').phase).toBe('ready');
     expect(random.calls).toBe(0);
-    const view = new GameView(controller);
+    const view = createView(controller);
     document.body.append(view.element);
     const query = within(view.element);
     const primary = query.getByRole('button', { name: 'Начать игру' });
@@ -100,8 +110,8 @@ describe('new game through real view, controller and domain objects', () => {
 
   it('isolates nested snapshots and presentation data before and after restart and between sessions', () => {
     const random = new ScriptedRandom([...identityBag, ...lBag]);
-    const controller = new GameController(new GameSession(random), 9800);
-    const other = new GameController(new GameSession(new ScriptedRandom(identityBag)), 4200);
+    const controller = new GameController(new GameSession(random, new ManualClock()), 9800);
+    const other = new GameController(new GameSession(new ScriptedRandom(identityBag), new ManualClock()), 4200);
     controller.dispatch('start');
     other.dispatch('start');
     const old = controller.snapshot();
@@ -137,17 +147,19 @@ describe('new game through real view, controller and domain objects', () => {
   });
 
   it('preserves ready after a late invalid random value and starts successfully on retry', () => {
-    const controller = new GameController(new GameSession(new ScriptedRandom([upper, upper, NaN, ...lBag])), 9800);
+    const controller = new GameController(new GameSession(new ScriptedRandom([upper, upper, NaN, ...lBag]), new ManualClock()), 9800);
     expect(() => controller.dispatch('start')).toThrow(RangeError);
-    expect(controller.snapshot()).toEqual({ phase: 'ready', board: emptyBoard(), active: null, next: null, score: 0, lines: 0, level: 1, highScore: 9800 });
+    expect(controller.snapshot()).toEqual({ phase: 'ready', board: emptyBoard(), active: null, next: null, score: 0, lines: 0, level: 1, highScore: 9800, elapsedMs: 0 });
     expectState(controller.dispatch('start'), 'L', 'O');
   });
 
   it('keeps commands and rendered state independent between two live game views', async () => {
     const leftRandom = new ScriptedRandom([...identityBag, ...lBag]);
     const rightRandom = new ScriptedRandom(jBag);
-    const left = new GameView(new GameController(new GameSession(leftRandom), 9800));
-    const right = new GameView(new GameController(new GameSession(rightRandom), 4200));
+    const leftController = new GameController(new GameSession(leftRandom, new ManualClock()), 9800);
+    const rightController = new GameController(new GameSession(rightRandom, new ManualClock()), 4200);
+    const left = createView(leftController);
+    const right = createView(rightController);
     document.body.append(left.element, right.element);
     const user = userEvent.setup();
     await user.click(within(left.element).getByRole('button', { name: 'Начать игру' }));
@@ -155,10 +167,12 @@ describe('new game through real view, controller and domain objects', () => {
     expect(within(right.element).getByRole('status')).toHaveAttribute('data-phase', 'ready');
     expect(rightRandom.calls).toBe(0);
     await user.click(within(right.element).getByRole('button', { name: 'Начать игру' }));
-    expectVisibleState(right.element, 'J', 'O', '4200');
+    expectVisibleState(right.element, 'J', 'O');
     await user.click(within(left.element).getByRole('button', { name: 'Начать заново' }));
     expectVisibleState(left.element, 'L', 'O');
-    expectVisibleState(right.element, 'J', 'O', '4200');
+    expectVisibleState(right.element, 'J', 'O');
+    expectState(leftController.snapshot(), 'L', 'O', 9800);
+    expectState(rightController.snapshot(), 'J', 'O', 4200);
     expect(leftRandom.calls).toBe(12);
     expect(rightRandom.calls).toBe(6);
   });
@@ -166,7 +180,7 @@ describe('new game through real view, controller and domain objects', () => {
   it('keeps the complete running game after a late random-source failure and restarts on retry', () => {
     const failure = new Error('Random source unavailable');
     const random = new ScriptedRandom([...identityBag, upper, upper, failure, ...lBag]);
-    const controller = new GameController(new GameSession(random), 9800);
+    const controller = new GameController(new GameSession(random, new ManualClock()), 9800);
     expectState(controller.dispatch('start'), 'I', 'O');
     expect(() => controller.dispatch('restart')).toThrow(failure);
     expectState(controller.snapshot(), 'I', 'O');

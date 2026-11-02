@@ -16,6 +16,6 @@ export function gameScreen(snapshot: GameState): GameScreenData {
     phase: snapshot.phase,
     cells,
     next: snapshot.next ? { kind: snapshot.next, cells: createFigure(snapshot.next).localCells() } : null,
-    metrics: { score: snapshot.score, lines: snapshot.lines, level: snapshot.level, highScore: snapshot.highScore },
+    metrics: { score: snapshot.score, elapsedMs: snapshot.elapsedMs },
   };
 }

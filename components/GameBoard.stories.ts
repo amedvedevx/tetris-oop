@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/html-vite';
 import { GameBoard, type GameBoardProps } from './GameBoard';
 import { emptyBoard, sampleBoard } from './gameShell.fixtures';
+import { Surface } from './Surface';
+import { Wrapper } from './Wrapper';
 
 const meta = {
   title: 'Blocks/GameBoard', tags: ['autodocs'], render: GameBoard,
@@ -14,4 +16,8 @@ export const Empty: Story = {};
 export const InProgress: Story = { args: { cells: sampleBoard() } };
 export const Filled: Story = {
   args: { cells: Array.from({ length: 20 }, () => Array.from({ length: 10 }, () => ({ state: 'locked', piece: 'Z' }))) },
+};
+export const Embedded: Story = {
+  args: { cells: sampleBoard(), variant: 'embedded' },
+  render: args => Wrapper({ maxWidth: 'board', children: [Surface({ variant: 'inverted', size: 'compact', children: [GameBoard(args)] })] }),
 };
