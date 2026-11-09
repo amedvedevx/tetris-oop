@@ -18,6 +18,7 @@ export async function expectGameLayout(page: Page, width: number) {
       ...box(cell), column: index % 4, row: Math.floor(index / 4),
     }));
     return {
+      headerBottom: box(main.querySelector('header')!).bottom,
       board: box(board), status: box(main.querySelector('[role="status"]')!),
       stats: box(main.querySelector('[aria-label="Показатели партии"]')!), preview: box(preview),
       controls: box(main.querySelector('[aria-label="Управление"]')!), stencil: box(stencil),
@@ -46,10 +47,14 @@ export async function expectGameLayout(page: Page, width: number) {
   } else {
     expect(layout.preview.x).toBeGreaterThanOrEqual(layout.board.right);
     expect(layout.controls.x).toBeGreaterThanOrEqual(layout.board.right);
-    expect(Math.abs(layout.status.bottom - layout.controls.bottom)).toBeLessThan(1);
     expect(Math.abs(layout.preview.y - layout.board.y)).toBeLessThan(1);
   }
-  expect(layout.controls.y).toBeGreaterThanOrEqual(layout.preview.bottom);
+  expect(Math.abs(layout.controls.x - layout.preview.x)).toBeLessThan(1);
+  expect(Math.abs(layout.controls.right - layout.preview.right)).toBeLessThan(1);
+  const controlsGap = layout.controls.y - layout.preview.bottom;
+  const pageGap = layout.board.y - layout.headerBottom;
+  expect(controlsGap).toBeGreaterThan(0);
+  expect(Math.abs(controlsGap - pageGap), `controls gap ${controlsGap}px should match page gap ${pageGap}px`).toBeLessThan(1);
 
   for (const [cells, columns, rows] of [[layout.boardCells, 10, 20], [layout.previewCells, 4, 4]] as const) {
     expect(cells).toHaveLength(columns * rows);

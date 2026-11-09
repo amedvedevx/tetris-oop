@@ -12,7 +12,7 @@ const meta = {
   },
   parameters: {
     layout: 'fullscreen', fullPage: true,
-    docs: { description: { component: 'Score and time share a compact dark footer directly below the board. Preview and controls occupy the right column; narrow screens stack the blocks. Time-only updates preserve the board, preview, status and focused controls.' } },
+    docs: { description: { component: 'Score and time share a compact dark footer directly below the board. Controls sit directly below the preview with the standard page gap and matching side edges. Both columns stack their content from the top; narrow screens stack the columns. Time-only updates preserve the board, preview, status and focused controls.' } },
   },
 } satisfies Meta<GamePageProps>;
 export default meta;

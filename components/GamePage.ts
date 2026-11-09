@@ -41,11 +41,11 @@ export function GamePage({ data, onAction, availability, statusMessage }: GamePa
     Wrapper({ as: 'main', maxWidth: 'game', width: 'full', padding: { base: 'md', md: 'xl' }, gap: 'lg', children: [
       GameHeader(),
       Wrapper({ display: 'grid', columns: { base: 1, md: 2 }, gap: 'lg', children: [
-        Wrapper({ gap: 'lg', align: 'center', justify: 'between', children: [
+        Wrapper({ gap: 'lg', align: 'center', children: [
           field,
           Wrapper({ maxWidth: 'board', width: 'full', children: [status] }),
         ] }),
-        Wrapper({ gap: 'lg', justify: 'between', children: [
+        Wrapper({ gap: 'lg', children: [
           preview,
           controls,
         ] }),
