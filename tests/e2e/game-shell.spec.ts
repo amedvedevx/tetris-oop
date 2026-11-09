@@ -1,6 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { test, expect, openStory } from './fixtures';
 import { expectGameLayout } from './game-shell-layout';
+import { expectReadoutsSeparated } from './readout-layout';
 import { expectReadable } from './text-layout';
 
 async function expectMetrics(page: Page, values: Record<string, string>) {
@@ -170,6 +171,7 @@ test('large page values and default text stay readable at 320px and verified 200
   const enlarged = await expectReadable(metric, '123456789012345', true);
   expect(enlarged.fontSize).toBeGreaterThanOrEqual(baseline.fontSize * 1.99);
   await expectAllTextReadable(page.getByRole('main'));
+  await expectReadoutsSeparated(page.getByRole('region', { name: 'Показатели партии', exact: true }));
   await expectGameLayout(page, 320);
   await expect(page.getByRole('button', { name: 'Начать заново', exact: true })).toBeDisabled();
 });
