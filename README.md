@@ -42,6 +42,15 @@ Storybook: [127.0.0.1:6006](http://127.0.0.1:6006).
 
 ## Сборка и проверки
 
+Быстрая проверка TypeScript для приложения, компонентов, тестов и конфигурации
+Storybook: `npm run typecheck`. Запускай её перед коммитом изменений TypeScript.
+
+В VS Code открывай корень проекта с `tsconfig.json`. Если редактор и команда
+показывают разные ошибки, проверь несохранённые изменения и перезагрузи окно
+через `Developer: Reload Window`. При разных версиях TypeScript выбери
+`TypeScript: Select TypeScript Version` → `Use Workspace Version`
+([документация VS Code](https://code.visualstudio.com/docs/typescript/typescript-transpiling#using-the-workspace-version-of-typescript)).
+
 Один раз установи Chromium для e2e:
 
 ```sh
