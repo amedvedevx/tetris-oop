@@ -19,8 +19,8 @@ function nodes(root: HTMLElement) {
 }
 
 function metrics(panel: HTMLElement) {
-  expect(within(panel).getAllByRole('term')).toHaveLength(4);
-  expect(within(panel).getAllByRole('definition')).toHaveLength(4);
+  expect(within(panel).getAllByRole('term')).toHaveLength(2);
+  expect(within(panel).getAllByRole('definition')).toHaveLength(2);
   return Object.fromEntries(Array.from(panel.querySelectorAll('dl'), item => [
     within(item).getByRole('term').textContent,
     within(item).getByRole('definition').textContent,
@@ -76,11 +76,11 @@ describe('real static GamePage composition', () => {
     expect(screen.getByRole('main')).toBeVisible();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('heading', { level: 1, name: 'Tetris OOP' })).toBeVisible();
-    for (const name of ['Показатели партии', 'Следующая фигура', 'Управление', 'Партия идёт']) {
+    for (const name of ['Следующая фигура', 'Управление', 'Партия идёт']) {
       expect(screen.getByRole('heading', { level: 2, name })).toBeVisible();
     }
     expect(occupied(view.board)).toEqual(originalCells);
-    expect(metrics(view.stats)).toEqual({ Очки: '1240', Рекорд: '9800', Линии: '0', Уровень: '1' });
+    expect(metrics(view.stats)).toEqual({ score: '1240', time: '01:01' });
     expect(sourcePreviewRows(view.preview)).toEqual(['J...', 'JJJ.', '....', '....']);
     expect(within(view.preview).getByRole('img', { name: 'Следующая фигура: J' })).toBeVisible();
     expect(screen.getAllByRole('img')).toHaveLength(2);
@@ -108,7 +108,7 @@ describe('real static GamePage composition', () => {
     expect(updated.buttons[0]).toHaveAccessibleName('Продолжить игру');
     for (const old of [initial.board, initial.stats, initial.preview]) expect(old).not.toBeInTheDocument();
     expect(occupied(updated.board)).toEqual(changedCells);
-    expect(metrics(updated.stats)).toEqual({ Очки: '7700', Рекорд: '11000', Линии: '12', Уровень: '2' });
+    expect(metrics(updated.stats)).toEqual({ score: '7700', time: '02:05' });
     expect(sourcePreviewRows(updated.preview)).toEqual(['..L.', 'LLL.', '....', '....']);
     expect(updated.status).toHaveTextContent('Пауза');
     expect(updated.status).toHaveAttribute('data-phase', 'paused');
@@ -122,13 +122,13 @@ describe('real static GamePage composition', () => {
     page.update(next);
     expect(initial.buttons[1]).toHaveFocus();
 
-    page.update(suppliedScreen({ phase: 'ready', cells: emptyCells(), next: null, metrics: { score: 0, highScore: 11000, lines: 0, level: 1 } }));
+    page.update(suppliedScreen({ phase: 'ready', cells: emptyCells(), next: null, metrics: { score: 0, elapsedMs: 0 } }));
     const cleared = nodes(page);
     expect(occupied(cleared.board)).toEqual([]);
     expect(sourcePreviewRows(cleared.preview)).toEqual(['....', '....', '....', '....']);
     expect(within(cleared.preview).getByRole('img', { name: 'Следующая фигура ещё не выбрана' })).toBeVisible();
     expect(cleared.preview.querySelectorAll('[data-piece]')).toHaveLength(0);
-    expect(metrics(cleared.stats)).toEqual({ Очки: '0', Рекорд: '11000', Линии: '0', Уровень: '1' });
+    expect(metrics(cleared.stats)).toEqual({ score: '0000', time: '00:00' });
     expect(cleared.buttons[1]).toBe(initial.buttons[1]);
     expect(cleared.buttons[1]).toBeDisabled();
     // A disabled focused control has no specified focus fallback; enabled transitions above do.
@@ -148,7 +148,7 @@ describe('real static GamePage composition', () => {
     expect(a).toEqual(['restart']);
     expect(b).toEqual([]);
     expect(nodes(second).board).toBe(secondBefore.board);
-    expect(metrics(secondBefore.stats)).toEqual({ Очки: '7700', Рекорд: '11000', Линии: '12', Уровень: '2' });
+    expect(metrics(secondBefore.stats)).toEqual({ score: '7700', time: '02:05' });
     expect(secondBefore.status).toHaveAttribute('data-phase', 'paused');
     await user.click(within(second).getByRole('button', { name: 'Продолжить игру' }));
     expect(a).toEqual(['restart']);
@@ -269,14 +269,14 @@ describe.each(rejectedUpdates)('atomic rejection of $group', ({ cases }) => {
     after.buttons.forEach((button, index) => expect(button).toBe(before.buttons[index]));
     expect(before.buttons[0]).toHaveFocus();
     expect(occupied(after.board)).toEqual(originalCells);
-    expect(metrics(after.stats)).toEqual({ Очки: '1240', Рекорд: '9800', Линии: '0', Уровень: '1' });
+    expect(metrics(after.stats)).toEqual({ score: '1240', time: '01:01' });
     expect(sourcePreviewRows(after.preview)).toEqual(['J...', 'JJJ.', '....', '....']);
     expect(after.status).toHaveAttribute('data-phase', 'running');
     await user.click(after.buttons[0]!);
     expect(history).toEqual(['restart']);
     page.update(replacementScreen());
     expect(occupied(nodes(page).board)).toEqual(changedCells);
-    expect(metrics(nodes(page).stats)).toEqual({ Очки: '7700', Рекорд: '11000', Линии: '12', Уровень: '2' });
+    expect(metrics(nodes(page).stats)).toEqual({ score: '7700', time: '02:05' });
     expect(sourcePreviewRows(nodes(page).preview)).toEqual(['..L.', 'LLL.', '....', '....']);
     expect(nodes(page).buttons[0]).toHaveFocus();
     await user.click(within(page).getByRole('button', { name: 'Продолжить игру' }));

@@ -4,14 +4,15 @@ import type { BoardCells } from './GameScreenData';
 export interface GameBoardProps {
   cells: BoardCells;
   ariaLabel?: string;
+  variant?: 'standalone' | 'embedded';
 }
 
-export function GameBoard({ cells, ariaLabel = 'Игровое поле: 10 столбцов, 20 строк' }: GameBoardProps): HTMLDivElement {
+export function GameBoard({ cells, ariaLabel = 'Игровое поле: 10 столбцов, 20 строк', variant = 'standalone' }: GameBoardProps): HTMLDivElement {
   if (cells.length !== 20 || cells.some(row => row.length !== 10)) {
     throw new RangeError('GameBoard requires exactly 20 rows of 10 cells');
   }
   const element = document.createElement('div');
-  element.className = 'w-full max-w-board rounded-lg bg-surface-dark p-1 shadow-lg';
+  element.className = variant === 'embedded' ? 'w-full p-1' : 'w-full max-w-board rounded-lg bg-surface-dark p-1 shadow-lg';
   element.setAttribute('role', 'img');
   element.setAttribute('aria-label', ariaLabel);
   const grid = document.createElement('div');

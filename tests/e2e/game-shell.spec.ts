@@ -28,7 +28,7 @@ async function expectDemoSnapshot(page: Page, phase: 'running' | 'paused') {
   const status = page.getByRole('status');
   await expect(status).toHaveAttribute('data-phase', phase);
   await expect(status.getByRole('heading', { name: phase === 'running' ? 'Партия идёт' : 'Пауза', exact: true })).toBeVisible();
-  await expectMetrics(page, { Очки: '1240', Рекорд: '6800', Линии: '8', Уровень: '1' });
+  await expectMetrics(page, { score: '1240', time: '00:03' });
   const board = page.getByRole('img', { name: 'Игровое поле: 10 столбцов, 20 строк', exact: true });
   await expect(board.locator('[data-x][data-y]')).toHaveCount(200);
   expect(await cells(board)).toEqual(demoOccupied);
@@ -67,7 +67,7 @@ for (const width of [320, 768, 1280]) {
     const controls = page.getByRole('region', { name: 'Управление', exact: true });
     const actions = controls.getByRole('button');
     const expectReady = async () => {
-      await expectMetrics(page, { Очки: '0', Рекорд: '0', Линии: '0', Уровень: '1' });
+      await expectMetrics(page, { score: '0000', time: '00:00' });
       await expect(board.locator('[data-x][data-y]')).toHaveCount(200);
       await expect(board.locator('[data-state="empty"]')).toHaveCount(200);
       expect(await cells(board)).toEqual([]);
@@ -162,7 +162,7 @@ test('snapshot demo preserves actual controls and focus through pointer and keyb
 test('large page values and default text stay readable at 320px and verified 200% root font', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await openStory(page, 'pages-gamepage--large-values');
-  await expectMetrics(page, { Очки: '123456789012345', Рекорд: '999999999999999', Линии: '123456', Уровень: '12345' });
+  await expectMetrics(page, { score: '123456789012345', time: '100:00' });
   const metric = page.getByText('123456789012345', { exact: true });
   const baseline = await expectReadable(metric, '123456789012345', true);
   await expectAllTextReadable(page.getByRole('main'));

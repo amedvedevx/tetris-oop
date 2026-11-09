@@ -18,6 +18,7 @@ export async function expectGameLayout(page: Page, width: number) {
       ...box(cell), column: index % 4, row: Math.floor(index / 4),
     }));
     return {
+      headerBottom: box(main.querySelector('header')!).bottom,
       board: box(board), status: box(main.querySelector('[role="status"]')!),
       stats: box(main.querySelector('[aria-label="Показатели партии"]')!), preview: box(preview),
       controls: box(main.querySelector('[aria-label="Управление"]')!), stencil: box(stencil),
@@ -34,26 +35,26 @@ export async function expectGameLayout(page: Page, width: number) {
   }
   expect(Math.abs(layout.board.x - layout.status.x)).toBeLessThan(1);
   expect(Math.abs(layout.board.right - layout.status.right)).toBeLessThan(1);
-  expect(layout.status.y).toBeGreaterThanOrEqual(layout.board.bottom);
+  expect(Math.abs(layout.stats.x - layout.board.x)).toBeLessThan(1);
+  expect(Math.abs(layout.stats.right - layout.board.right)).toBeLessThan(1);
+  expect(Math.abs(layout.stats.y - layout.board.bottom)).toBeLessThan(1);
+  expect(layout.status.y).toBeGreaterThanOrEqual(layout.stats.bottom);
   expect(Math.abs(layout.stencil.x + layout.stencil.width / 2 - layout.preview.x - layout.preview.width / 2)).toBeLessThan(1);
   expect(Math.abs(layout.previewHeading.x - layout.previewDetail.x)).toBeLessThan(1);
   expect(layout.previewHeading.x).toBeLessThanOrEqual(layout.stencil.x + 1);
   if (width === 320) {
-    expect(layout.stats.y).toBeGreaterThanOrEqual(layout.status.bottom);
-    expect(layout.preview.y).toBeGreaterThanOrEqual(layout.stats.bottom);
+    expect(layout.preview.y).toBeGreaterThanOrEqual(layout.status.bottom);
   } else {
-    expect(layout.stats.x).toBeGreaterThanOrEqual(layout.board.right);
+    expect(layout.preview.x).toBeGreaterThanOrEqual(layout.board.right);
     expect(layout.controls.x).toBeGreaterThanOrEqual(layout.board.right);
-    expect(Math.abs(layout.status.bottom - layout.controls.bottom)).toBeLessThan(1);
-    if (width === 768) {
-      expect(layout.preview.y).toBeGreaterThanOrEqual(layout.stats.bottom);
-    } else {
-      expect(layout.preview.x).toBeGreaterThanOrEqual(layout.stats.right);
-      expect(Math.abs(layout.preview.y - layout.stats.y)).toBeLessThan(1);
-      expect(Math.abs(layout.preview.height - layout.stats.height)).toBeLessThan(1);
-    }
+    expect(Math.abs(layout.preview.y - layout.board.y)).toBeLessThan(1);
   }
-  expect(layout.controls.y).toBeGreaterThanOrEqual(layout.preview.bottom);
+  expect(Math.abs(layout.controls.x - layout.preview.x)).toBeLessThan(1);
+  expect(Math.abs(layout.controls.right - layout.preview.right)).toBeLessThan(1);
+  const controlsGap = layout.controls.y - layout.preview.bottom;
+  const pageGap = layout.board.y - layout.headerBottom;
+  expect(controlsGap).toBeGreaterThan(0);
+  expect(Math.abs(controlsGap - pageGap), `controls gap ${controlsGap}px should match page gap ${pageGap}px`).toBeLessThan(1);
 
   for (const [cells, columns, rows] of [[layout.boardCells, 10, 20], [layout.previewCells, 4, 4]] as const) {
     expect(cells).toHaveLength(columns * rows);
